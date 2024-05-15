@@ -1,0 +1,13 @@
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\bin\Debug\WpfLibrary.dll
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\bin\Debug\WpfLibrary.pdb
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.csproj.AssemblyReference.cache
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary_MarkupCompile.cache
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary_MarkupCompile.lref
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\Themes\Generic.baml
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.g.resources
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.Properties.Resources.resources
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.csproj.GenerateResource.cache
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.csproj.CoreCompileInputs.cache
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.dll
+D:\My Homework\Cursova\Cursova_program\WpfLibrary\obj\Debug\WpfLibrary.pdb
