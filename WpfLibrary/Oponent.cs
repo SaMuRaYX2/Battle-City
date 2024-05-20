@@ -14,6 +14,8 @@ namespace WpfLibrary
         public Oponent() : base()
         {
             list_of_oponents = new List<Oponent>();
+            Main_tank.Fill = Brushes.Thistle;
+            Main_tank.Stroke = Brushes.Black;
 
         }
 
@@ -67,13 +69,7 @@ namespace WpfLibrary
                     }
                     
                 }
-                else
-                {
-                    PositionX = i;
-                    Canvas.SetLeft(Tank_grid, PositionX);
-                    Canvas.SetTop(Tank_grid, PositionY);
-                    points_of_tanks = point_to_test;
-                }
+                
                 if (test_to_find_point == true)
                 {
                     break;

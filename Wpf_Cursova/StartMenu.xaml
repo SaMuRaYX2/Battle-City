@@ -1,0 +1,70 @@
+﻿<Window x:Class="Wpf_Cursova.StartMenu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:local="clr-namespace:Wpf_Cursova"
+        mc:Ignorable="d"
+        Title="Battle city" Height="450" Width="800"
+        WindowStyle="None"
+        ShowInTaskbar="True"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid x:Name="grid_of_window">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            
+        </Grid.ColumnDefinitions>
+        <Border x:Name="border_of_hiden_button" Grid.Row="0" Grid.Column="16" Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="3" BorderBrush="Black" CornerRadius="100" Margin="10,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <TextBlock x:Name="hide_window" Margin="5,2,5,2" Text="->" FontSize="30" FontWeight="Bold" Padding="0,0,0,8" Foreground="DarkBlue" Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        </Border>
+        <TextBlock Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="8" Grid.RowSpan="2" Background="Transparent" Text="Battle City 2.0" Foreground="DarkGoldenrod" FontSize="40" TextAlignment="Center" FontStyle="Italic" FontFamily="Arial" FontWeight="Bold"></TextBlock>
+        <Border Grid.Row="10" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="20,5,20,5"></Border>
+        <TextBlock x:Name="exit_game" Grid.Row="10" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" Text="EXIT" TextAlignment="Center" VerticalAlignment="Center" FontSize="25" FontStyle="Italic" FontWeight="Bold" Foreground="#e65c00" Opacity="1" Margin="20,0,20,0"></TextBlock>
+        <Border Grid.Row="6" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="20,5,20,5"></Border>
+        <TextBlock x:Name="start_game_two_player" Grid.Row="6" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" Text="2 - Player" TextAlignment="Center" VerticalAlignment="Center" FontSize="25" FontStyle="Italic" FontWeight="Bold" Foreground="#e65c00" Opacity="1" Margin="20,0,20,0"></TextBlock>
+        <Border Grid.Row="4" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="20,5,20,5"></Border>
+        <TextBlock x:Name="start_game_one_player" Grid.Row="4" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" Text="1 - Player" TextAlignment="Center" VerticalAlignment="Center" FontSize="25" FontStyle="Italic" FontWeight="Bold" Foreground="#e65c00" Opacity="1" Margin="20,0,20,0"></TextBlock>
+        <Border Grid.Row="8" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="20,5,20,5"></Border>
+        <TextBlock x:Name="start_multiplayer" Grid.Row="8" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" Text="Multiplayer" TextAlignment="Center" VerticalAlignment="Center" FontSize="25" FontStyle="Italic" FontWeight="Bold" Foreground="#e65c00" Opacity="1" Margin="20,0,20,0"></TextBlock>
+        
+        <Image x:Name="background_gif" Stretch="UniformToFill" Grid.ColumnSpan="18" Grid.RowSpan="15" Panel.ZIndex="-2"></Image>
+    </Grid>
+    
+</Window>

@@ -16,3 +16,10 @@ D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\Wpf_Cursova.pdb
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfLibrary.dll
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfLibrary.pdb
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\Wpf_Cursova.csproj.CopyComplete
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\StartMenu.g.cs
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\StartMenu.baml
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfAnimatedGif.dll
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfAnimatedGif.pdb
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfAnimatedGif.xml
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\PauseGame.g.cs
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\PauseGame.baml

@@ -13,7 +13,7 @@ namespace WpfLibrary
 {
     public class Bullet_Oponent : Bullet
     {
-        public Bullet_Oponent(Canvas canvas, Oponent my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points) : base(canvas, my_tank, locate_mouse, UP_muzzle, point_center_tank, side, degrees, Points)
+        public Bullet_Oponent(Canvas canvas, Oponent my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage) : base(canvas, my_tank, locate_mouse, UP_muzzle, point_center_tank, side, degrees, Points, damage)
         {
 
         }
@@ -24,18 +24,23 @@ namespace WpfLibrary
             if(side_of_rotate_tank == "UP")
             {
                 rotate.Angle = 0;
+                degrees = 0;
             }
             else if(side_of_rotate_tank == "DOWN")
             {
                 rotate.Angle = 180;
+                degrees = 180;
             }
             else if(side_of_rotate_tank == "LEFT")
             {
                 rotate.Angle = -90;
+                degrees = -90;
             }
             else if(side_of_rotate_tank == "RIGHT")
             {
-                rotate.Angle = 90;  
+                rotate.Angle = 90;
+                degrees = 90;
+
             }
             Point position_of_bullet;
             double offsetY = - My_tank.Height;
@@ -51,6 +56,7 @@ namespace WpfLibrary
             Canvas.SetLeft(grid_bullet, point_to_ballet.X - grid_bullet.Width / 2);
             Canvas.SetTop(grid_bullet, point_to_ballet.Y);
             Play_zone.Children.Add(grid_bullet);
+            Make_BOOM_From_Muzzle();
             Play_zone.UpdateLayout();
             bool bullet_test = true;
             while (bullet_test)
@@ -66,6 +72,7 @@ namespace WpfLibrary
                         if (index_of_Shot != -1)
                         {
                             Play_zone.Children.RemoveAt(index_of_Shot);
+                            Make_Boom_tank(position_of_bullet);
                         }
                         //MessageBox.Show("Пуля", "Кінець польту пулі", MessageBoxButton.OK, MessageBoxImage.Stop);
                         break;
@@ -73,11 +80,16 @@ namespace WpfLibrary
                 }
                 if (bullet_test)
                 {
-                    offsetY -= 4;
+                    offsetY -= 10;
                     translateTransform.Y = offsetY;
                     grid_bullet.InvalidateVisual();
-                    Test_To_KILL(position_of_bullet);
-                    await Task.Delay(10);
+                    bool test_to_fire = false;
+                    test_to_fire = Test_To_KILL(position_of_bullet);
+                    if (test_to_fire)
+                    {
+                        bullet_test = false;
+                    }
+                    await Task.Delay(16);
                 }
             }
         }
@@ -100,9 +112,25 @@ namespace WpfLibrary
                 }
                 if (test_to_kill == true)
                 {
-                    //Play_zone.Children.Remove(Tank.Tank_grid);
-                    Destroy_tank(Tank);
-                    Tank = null;
+
+                    int index_of_Shot = Play_zone.Children.IndexOf(grid_bullet);
+                    if (index_of_Shot != -1)
+                    {
+                        Play_zone.Children.RemoveAt(index_of_Shot);
+                    }
+                    Tank.Health -= damage;
+                    if (Tank.Health <= 0)
+                    {
+                        Destroy_tank(Tank);
+                        Make_Boom_tank(position_of_bullet);
+                        Tank = null;
+                    }
+                    else if (Tank.Health < 100 && Tank.Health > 0)
+                    {
+                        Type_of_Damage_Tank(Tank);
+                    }
+                    
+                    
                     Play_zone.UpdateLayout();
                 }
             }

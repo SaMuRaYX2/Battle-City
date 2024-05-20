@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Wpf_Cursova"
              xmlns:MyNamespace="clr-namespace:WpfLibrary;assembly=WpfLibrary"
-             StartupUri="MainWindow.xaml">
+             StartupUri="StartMenu.xaml">
     <Application.Resources>
          
     </Application.Resources>

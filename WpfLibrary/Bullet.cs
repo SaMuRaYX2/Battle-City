@@ -8,6 +8,9 @@ using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Diagnostics;
+using System.Windows.Threading;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 
 namespace WpfLibrary
@@ -24,8 +27,11 @@ namespace WpfLibrary
         public string side_of_rotate_tank { get; set; }
         public List<Point> points_denied { get; set; }
         protected List<Oponent> oponents { get; set; }
+        public DispatcherTimer timer {private get; set; }
         public Tank Tank { get; set; }
-
+        
+        public Creating_oponent creating_oponent {private get; set; }
+        public int damage { get; set; }
         public void GetMainTank( Tank my_tank)
         {
             this.Tank = my_tank;
@@ -34,8 +40,9 @@ namespace WpfLibrary
         {
             return this.Tank;
         }
-        public Bullet(Canvas canvas, Tank my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points)
+        public Bullet(Canvas canvas, Tank my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage)
         {
+            this.damage = damage;
             points_denied = Points;
             point_to_ballet = point_center_tank;
             side_of_rotate_tank = side;
@@ -74,6 +81,99 @@ namespace WpfLibrary
             grid_bullet.UpdateLayout();
 
             // Position of Bullet;
+            
+
+
+        }
+        public void Make_BOOM_From_Muzzle()
+        {
+            Grid boom_grid = new Grid();
+            //Border border = new Border();
+            //border.BorderThickness = new Thickness(5);
+            //border.BorderBrush = Brushes.Black;
+            //boom_grid.Children.Add(border);
+            boom_grid.Width = 20;
+            boom_grid.Height = 20;
+            double offset = -My_tank.Height;
+            // Створення Image для вибуху з дула;
+            Image explosion = new Image();
+            explosion.Width = boom_grid.Width;
+            explosion.Height = boom_grid.Height;
+            boom_grid.Children.Add(explosion);
+            TransformGroup group = new TransformGroup();
+            TranslateTransform translate = new TranslateTransform(0, offset);
+            RotateTransform rotate = new RotateTransform(degrees);
+            rotate.CenterX = boom_grid.Width / 2;
+            rotate.CenterY = boom_grid.Height / 2;
+            group.Children.Add(translate);
+            group.Children.Add(rotate);
+            boom_grid.RenderTransform = group;
+            Canvas.SetLeft(boom_grid, point_to_ballet.X - boom_grid.Width / 2);
+            Canvas.SetTop(boom_grid, point_to_ballet.Y - boom_grid.Height/2);
+            Play_zone.Children.Add(boom_grid);
+            //Створення анімації
+            var storyboard = new Storyboard();
+            storyboard.FillBehavior = FillBehavior.Stop;
+            //Створення ключових кадрів
+            var animation = new ObjectAnimationUsingKeyFrames();
+            Storyboard.SetTarget(animation, explosion);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("Source"));
+            //Додавання ключових кадрів;
+            for (int i = 1; i <= 16; i++)
+            {
+                var keyFrame = new DiscreteObjectKeyFrame   
+                {
+                    KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(i * 50)),
+                    Value = new BitmapImage(new Uri($"D:\\My Homework\\Cursova\\Texture_image\\muzzle_boom\\muzzle_cadr{i}.png"))
+                };
+                animation.KeyFrames.Add(keyFrame);
+            }
+            //Додаємо анімацію до StoryBoard;
+            storyboard.Children.Add(animation);
+            //Видаляємо вибух після закінчення анімації;
+            storyboard.Completed += (s, e) =>
+            {
+                boom_grid.Children.Remove(explosion);
+                Play_zone.Children.Remove(boom_grid);
+            };
+            //Запуск анімації;
+            storyboard.Begin();
+        }
+        public void Make_Boom_tank(Point position_of_bullet)
+        {
+            Grid boom_grid = new Grid();
+            boom_grid.Width = 50;
+            boom_grid.Height = 50;
+            
+            Image explosion = new Image();
+            explosion.Width = boom_grid.Width;
+            explosion.Height = boom_grid.Height;
+            boom_grid.Children.Add(explosion);
+            Canvas.SetLeft(boom_grid, position_of_bullet.X - boom_grid.Width / 2);
+            Canvas.SetTop(boom_grid, position_of_bullet.Y - boom_grid.Height / 2);
+            Play_zone.Children.Add(boom_grid);
+            var storyboard = new Storyboard();
+            storyboard.FillBehavior = FillBehavior.Stop;
+
+            var animation = new ObjectAnimationUsingKeyFrames();
+            Storyboard.SetTarget(animation, explosion);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("Source"));
+            for(int i = 1; i <= 5; i++)
+            {
+                var keyFrame = new DiscreteObjectKeyFrame
+                {
+                    KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(i * 300)),
+                    Value = new BitmapImage(new Uri($"D:\\My Homework\\Cursova\\Texture_image\\tank_boom\\cadr{i}_boom.png"))
+                };
+                animation.KeyFrames.Add(keyFrame);
+            }
+            storyboard.Children.Add(animation);
+            storyboard.Completed += (s, e) =>
+            {
+                boom_grid.Children.Remove(explosion);
+                Play_zone.Children.Remove(boom_grid);
+            };
+            storyboard.Begin();
         }
 
         public void GetOponents(List<Oponent> all_oponents)
@@ -99,6 +199,7 @@ namespace WpfLibrary
             Canvas.SetLeft(grid_bullet, point_to_ballet.X - grid_bullet.Width / 2);
             Canvas.SetTop(grid_bullet, point_to_ballet.Y);
             Play_zone.Children.Add(grid_bullet);
+            Make_BOOM_From_Muzzle();
             Play_zone.UpdateLayout();
             bool bullet_test = true;
             while (bullet_test)
@@ -114,6 +215,7 @@ namespace WpfLibrary
                         if (index_of_Shot != -1)
                         {
                             Play_zone.Children.RemoveAt(index_of_Shot);
+                            Make_Boom_tank(position_of_bullet);
                         }
                         //MessageBox.Show("Пуля", "Кінець польту пулі", MessageBoxButton.OK, MessageBoxImage.Stop);
                         break;
@@ -122,15 +224,16 @@ namespace WpfLibrary
                 if (bullet_test)
                 {
                     bool test_to_fire = false;
-                    offsetY -= 4;
+                    offsetY -= 10;
                     translateTransform.Y = offsetY;
                     Play_zone.InvalidateVisual();
                     test_to_fire = Test_To_KILL(position_of_bullet);
                     if (test_to_fire)
                     {
+
                         bullet_test = false;
                     }
-                    await Task.Delay(10);
+                    await Task.Delay(16);
                 }
             }
 
@@ -154,16 +257,31 @@ namespace WpfLibrary
                 }
                 if (test_to_kill == true)
                 {
-                    //Play_zone.Children.Remove(oponents[i].Tank_grid);
+                    
                     int index_of_Shot = Play_zone.Children.IndexOf(grid_bullet);
                     if (index_of_Shot != -1)
                     {
                         Play_zone.Children.RemoveAt(index_of_Shot);
                     }
-                    Destroy_tank(oponents[i]);
+                    oponents[i].Health -= damage;
+                    if (oponents[i].Health <= 0)
+                    {
+                        Destroy_tank(oponents[i]);
+                        Make_Boom_tank(position_of_bullet);
+                        Tank.Killed_Oponents.Add(oponents[i].Tank_grid);
+                        oponents.RemoveAt(i);
+                        Play_zone.UpdateLayout();
+                        creating_oponent.BackGroundCreatingBots();
+                        if (timer.IsEnabled == false)
+                        {
+                            timer.Start();
+                        }
+                    }
+                    else if (oponents[i].Health < 100 && oponents[i].Health >= 0)
+                    {
+                        Type_of_Damage_Tank(oponents[i]);
+                    }
                     
-                    oponents.RemoveAt(i);
-                    Play_zone.UpdateLayout();
                     break;
                 }
             }
@@ -171,7 +289,7 @@ namespace WpfLibrary
         }
         public void Destroy_tank(Tank tank)
         {
-            tank.Main_tank.Fill = Brushes.Brown;
+            tank.Main_tank.Fill = Brushes.DarkRed;
             TransformGroup group_for_right = new TransformGroup();
             TranslateTransform translate_right = new TranslateTransform(tank.Tank_grid.ActualWidth / 4, 0);
             TranslateTransform translate_left = new TranslateTransform(-tank.Tank_grid.ActualWidth / 4, 0);
@@ -191,6 +309,60 @@ namespace WpfLibrary
             group_muzzle.Children.Add(rotate_muzzle);
             group_muzzle.Children.Add(translate_muzzle);
             tank.UP_Muzzle_tank.RenderTransform = group_muzzle;
+        }
+        public void Type_of_Damage_Tank(Tank tank)
+        {
+            if (tank.Health == 75)
+            {
+                tank.Main_tank.Fill = Brushes.PeachPuff;
+                tank.UP_Muzzle_tank.Fill = Brushes.DarkBlue;
+                TransformGroup group_for_right = new TransformGroup();
+                TranslateTransform translate_right = new TranslateTransform(tank.Tank_grid.ActualWidth /16, 0);
+                TranslateTransform translate_left = new TranslateTransform(-tank.Tank_grid.ActualWidth / 16, 0);
+                RotateTransform chassi_right_rotate = new RotateTransform(2);
+                RotateTransform chassi_left_rotate = new RotateTransform(-2);
+                group_for_right.Children.Add(translate_right);
+                group_for_right.Children.Add(chassi_right_rotate);
+                tank.Chassis_right.RenderTransform = group_for_right;
+                TransformGroup group_for_left = new TransformGroup();
+                group_for_left.Children.Add(translate_left);
+                group_for_left.Children.Add(chassi_left_rotate);
+                tank.Chassis_left.RenderTransform = group_for_left;
+            }
+            else if(tank.Health == 50)
+            {
+                tank.Main_tank.Fill = Brushes.Peru;
+                tank.UP_Muzzle_tank.Fill = Brushes.Maroon;
+                TransformGroup group_for_right = new TransformGroup();
+                TranslateTransform translate_right = new TranslateTransform(tank.Tank_grid.ActualWidth / 12, 0);
+                TranslateTransform translate_left = new TranslateTransform(-tank.Tank_grid.ActualWidth / 12, 0);
+                RotateTransform chassi_right_rotate = new RotateTransform(5);
+                RotateTransform chassi_left_rotate = new RotateTransform(-5);
+                group_for_right.Children.Add(translate_right);
+                group_for_right.Children.Add(chassi_right_rotate);
+                tank.Chassis_right.RenderTransform = group_for_right;
+                TransformGroup group_for_left = new TransformGroup();
+                group_for_left.Children.Add(translate_left);
+                group_for_left.Children.Add(chassi_left_rotate);
+                tank.Chassis_left.RenderTransform = group_for_left;
+            }
+            else if(tank.Health == 25)
+            {
+                tank.Main_tank.Fill = Brushes.DarkRed;
+                tank.UP_Muzzle_tank.Fill = Brushes.Sienna;
+                TransformGroup group_for_right = new TransformGroup();
+                TranslateTransform translate_right = new TranslateTransform(tank.Tank_grid.ActualWidth / 8, 0);
+                TranslateTransform translate_left = new TranslateTransform(-tank.Tank_grid.ActualWidth / 8, 0);
+                RotateTransform chassi_right_rotate = new RotateTransform(10);
+                RotateTransform chassi_left_rotate = new RotateTransform(-10);
+                group_for_right.Children.Add(translate_right);
+                group_for_right.Children.Add(chassi_right_rotate);
+                tank.Chassis_right.RenderTransform = group_for_right;
+                TransformGroup group_for_left = new TransformGroup();
+                group_for_left.Children.Add(translate_left);
+                group_for_left.Children.Add(chassi_left_rotate);
+                tank.Chassis_left.RenderTransform = group_for_left;
+            }
         }
     }
 }

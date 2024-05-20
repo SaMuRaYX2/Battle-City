@@ -98,7 +98,7 @@ namespace WpfLibrary
                 Under_muzzle.RenderTransform = rotate;
                 UP_muzzle.RenderTransform = rotate;
             }
-            else if(MouseY < TankY && MouseX < TankY)
+            else if(MouseY < TankY && MouseX < TankX)
             {
                 cat_sin = TankX - MouseX;
                 cat_2 = TankY - MouseY;

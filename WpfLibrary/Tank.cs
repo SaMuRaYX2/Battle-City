@@ -29,8 +29,11 @@ namespace WpfLibrary
         public Point CenterUpMuzzle { get; set; }
         public List<Point> points_of_tanks { get; set; }
         public List<Oponent> list_of_oponents { get; set; }
+        public List<Grid> Killed_Oponents { get; set; }
+        public int Health = 100;
         public Tank()
         {
+            Killed_Oponents = new List<Grid>();
             points_of_tanks = new List<Point>();
             Tank_grid = new Grid();   
             Tank_grid.Height = 30;
@@ -64,8 +67,8 @@ namespace WpfLibrary
             geometry.Figures.Add(figure);
             path.Data = geometry;
             Main_tank = path;
-            Main_tank.Fill = Brushes.Gray;
-            Main_tank.Stroke = Brushes.Black;
+            Main_tank.Fill = Brushes.DarkGreen;
+            Main_tank.Stroke = Brushes.Orange;
             Main_tank.StrokeThickness = 1;
             Grid.SetRow(Main_tank, 2);
             Grid.SetColumn(Main_tank, 1);

@@ -23,12 +23,15 @@
             <ColumnDefinition></ColumnDefinition>
             
         </Grid.ColumnDefinitions>
-        <Button x:Name="start_game" Grid.Row="1" Grid.Column="2" Margin="0,360,0,360" Content="Start Game" FontSize="25" Foreground="Black" FontStyle="Italic" FontWeight="Bold" Background="Gray" Opacity="0.9"></Button>
+        
         <Canvas x:Name="play_zone" Grid.Row="1" Grid.Column="1">
-            
+        
                 
             
         </Canvas>
+        <Border Grid.Column="2" BorderThickness="4" BorderBrush="DarkViolet" CornerRadius="20" Background="Black" Margin="0,0,0,-20">
+        <TextBlock x:Name="pause_game" Text="----Pause----" FontSize="30"  FontWeight="Bold" FontStyle="Italic" Foreground="DarkMagenta" TextAlignment="Center" VerticalAlignment="Center" Background="Transparent"></TextBlock>
+        </Border>
     </Grid>
     
 </Window>
