@@ -58,12 +58,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EnterInformationGamer.xaml.cs">
+      <DependentUpon>EnterInformationGamer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PauseGame.xaml.cs">
       <DependentUpon>PauseGame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Result_of_Game.xaml.cs">
+      <DependentUpon>Result_of_Game.xaml</DependentUpon>
     </Compile>
     <Compile Include="StartMenu.xaml.cs">
       <DependentUpon>StartMenu.xaml</DependentUpon>
     </Compile>
+    <Page Include="EnterInformationGamer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -77,6 +87,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="PauseGame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Result_of_Game.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

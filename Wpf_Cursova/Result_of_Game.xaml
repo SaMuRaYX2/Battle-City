@@ -1,0 +1,95 @@
+﻿<Window x:Class="Wpf_Cursova.Result_of_Game"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf_Cursova"
+        mc:Ignorable="d"
+        Title="Result_of_Game" Height="600" Width="800"
+        WindowStyle="None"
+        MaxHeight="600"
+        MinHeight="600"
+        MaxWidth="800"
+        MinWidth="800"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            
+        </Grid.ColumnDefinitions>
+        <!--<TextBlock x:Name="winner_of_game" Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Grid.ColumnSpan="5" TextAlignment="Center" VerticalAlignment="Top" Text="Тут буде вивведений ігрока який переміг" TextWrapping="Wrap" FontSize="40" FontWeight="ExtraBlack" FontStyle="Italic" TextDecorations="Underline"></TextBlock>
+        <Border Grid.Row="4" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="5,10,5,10"></Border>
+        <TextBlock x:Name="show_statictic" Grid.Row="4" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" Text="Show |Statictic|" TextAlignment="Center" VerticalAlignment="Center" FontSize="35" FontStyle="Italic" FontWeight="Bold" Foreground="Lime" Opacity="1" Margin="5,10,5,10" Padding="0,10,0,10"></TextBlock>
+        <Border Grid.Row="7" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="5,10,5,10"></Border>
+        <TextBlock x:Name="exit_to_menu" Grid.Row="7" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" Text="Exit" TextAlignment="Center" VerticalAlignment="Center" FontSize="35" FontStyle="Italic" FontWeight="Bold" Foreground="Red" Opacity="1" Margin="5,10,5,10" Padding="0,10,0,10"></TextBlock>-->
+        <Border Grid.Row="2" Grid.Column="7" Grid.RowSpan="6" Grid.ColumnSpan="1" Panel.ZIndex="2" BorderBrush="WhiteSmoke" BorderThickness="0,0,8,0" CornerRadius="40">
+            <Border.Effect>
+                <DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="7" Direction="0"></DropShadowEffect>
+            </Border.Effect>
+        </Border>
+
+        <Border Grid.Row="2" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="1" BorderBrush="WhiteSmoke" BorderThickness="8,0,0,0" CornerRadius="40">
+            <Border.Effect>
+                <DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="7" Direction="180"></DropShadowEffect>
+            </Border.Effect>
+        </Border>
+        
+        <Border Grid.Row="2" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="7" Background="LightSkyBlue" CornerRadius="40" Opacity="0.6" BorderBrush="WhiteSmoke" BorderThickness="8,0,8,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="winner_of_game" Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Grid.ColumnSpan="7" TextAlignment="Center" VerticalAlignment="Top" Text="Тут буде вивведений ігрока який переміг" TextWrapping="Wrap" FontSize="40" FontWeight="ExtraBlack" FontStyle="Italic" TextDecorations="Underline"></TextBlock>
+                <Border Grid.Row="5" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="5,10,5,-10"></Border>
+                <TextBlock x:Name="show_statictic" Grid.Row="5" Grid.ColumnSpan="5" Grid.Column="2" Grid.RowSpan="2" Text="Result" TextAlignment="Center" VerticalAlignment="Center" FontSize="35" FontStyle="Italic" FontWeight="Bold" Foreground="White" Opacity="0.7" Margin="5,17,5,0" Padding="0,0,0,5"></TextBlock>
+                <Border Grid.Row="8" Grid.ColumnSpan="3" Grid.Column="3" Grid.RowSpan="2" BorderThickness="2" BorderBrush="#000000" Background="#000000" Opacity="0.5" CornerRadius="40" Margin="5,-5,5,10"></Border>
+                <TextBlock x:Name="exit_to_menu" Grid.Row="8" Grid.ColumnSpan="3" Grid.Column="3" Grid.RowSpan="2" Text="Exit" TextAlignment="Center" VerticalAlignment="Center" FontSize="35" FontStyle="Italic" FontWeight="Bold" Foreground="Red" Opacity="1" Margin="5,0,5,15" Padding="0,0,0,0"></TextBlock>
+            </Grid>
+        </Border>
+        <Image x:Name="background_gif" Stretch="UniformToFill" Panel.ZIndex="-2" Grid.RowSpan="10" Grid.ColumnSpan="9"></Image>
+    </Grid>
+</Window>

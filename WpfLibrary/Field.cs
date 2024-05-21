@@ -287,7 +287,7 @@ namespace WpfLibrary
         public void Find_Empty_Field()
         {
             bool test_to_empty_grid = true;
-            for (int i = 4; i < Grid_field.RowDefinitions.Count - 3; i++)
+            for (int i = 1; i < Grid_field.RowDefinitions.Count - 1; i++)
             {
                 
                 for (int j = 1; j < Grid_field.ColumnDefinitions.Count - 1; j++)

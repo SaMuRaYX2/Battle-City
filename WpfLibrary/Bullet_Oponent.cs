@@ -130,7 +130,6 @@ namespace WpfLibrary
                         Type_of_Damage_Tank(Tank);
                     }
                     
-                    
                     Play_zone.UpdateLayout();
                 }
             }

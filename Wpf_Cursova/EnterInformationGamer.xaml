@@ -1,0 +1,55 @@
+﻿<Window x:Class="Wpf_Cursova.EnterInformationGamer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf_Cursova"
+        mc:Ignorable="d"
+        Title="EnterInformationGamer" Height="425" Width="616"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        MaxHeight="425"
+        MinHeight="425"
+        MaxWidth="616"
+        MinWidth="616">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.RowSpan="9" Grid.ColumnSpan="6" Stretch="UniformToFill" Panel.ZIndex="-2" x:Name="background_gif"></Image>
+        <Border Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="1" Grid.RowSpan="2" Panel.ZIndex="2" BorderBrush="WhiteSmoke" BorderThickness="0,0,8,0" CornerRadius="30,10,30,10">
+            <Border.Effect>
+                <DropShadowEffect Color="White" BlurRadius="15" ShadowDepth="7" Direction="0"></DropShadowEffect>
+            </Border.Effect>
+        </Border>
+        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" BorderBrush="Black" BorderThickness="3" CornerRadius="30,10,30,10" Background="Blue" Opacity="0.4"></Border>
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Text="Name of Player" FontSize="40" TextAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBold" Foreground="White"></TextBlock>
+        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="SaddleBrown" CornerRadius="30" Margin="0,10,0,10"></Border>
+        <TextBlock Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="Transparent" Foreground="Black" Text="Player 1" TextAlignment="Center" VerticalAlignment="Center" Margin="0,0,260,0" FontSize="30" FontWeight="ExtraBlack" FontStyle="Italic"></TextBlock>
+        <TextBox x:Name="player_1" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="Transparent" Foreground="White" Opacity="0.7" Text="Enter" FontSize="30" TextAlignment="Center" VerticalAlignment="Center" Margin="160,0,20,0" BorderThickness="0" FontWeight="DemiBold"></TextBox>
+        <Border Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="SaddleBrown" CornerRadius="30" Margin="0,10,0,10"></Border>
+        <TextBlock Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="Transparent" Foreground="Black" Text="Player 2" TextAlignment="Center" VerticalAlignment="Center" Margin="0,0,260,0" FontSize="30" FontWeight="ExtraBlack" FontStyle="Italic"></TextBlock>
+        <TextBox x:Name="player_2" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Background="Transparent" Foreground="White" Opacity="0.7" Text="Enter" FontSize="30" TextAlignment="Center" VerticalAlignment="Center" Margin="160,0,20,0" BorderThickness="0" FontWeight="DemiBold"></TextBox>
+        <Image x:Name="arrow_next" Grid.Row="7" Grid.RowSpan="2" Grid.Column="5" Source="D:\My Homework\Cursova\Texture_image\Arrow_Next.png" Stretch="UniformToFill"></Image>
+        <Button x:Name="helper_focus" Opacity="0" Width="0" Height="0"></Button>
+    </Grid>
+</Window>

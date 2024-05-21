@@ -24,7 +24,9 @@ namespace Wpf_Cursova
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+        public string Type_of_Game { get; set; }
+        public string Name_of_player_1 { get; set; }
+        public string Name_of_player_2 { get; set; }
         public List<Point> points_for_my_tank { get; set; }
         public List<Point> points_for_oponent { get; set; }
         public List<Point> points_tanks { get; set; }
@@ -42,7 +44,7 @@ namespace Wpf_Cursova
 
         public List<Image> Texture_image { get; set; }
 
-        public List<Point> Points { get; set; } // Points of Field and Tank;
+        public List<Point> Points { get; set; } // Points of Field;
 
         public Point locate_mouse { get; private set; }
 
@@ -54,18 +56,22 @@ namespace Wpf_Cursova
 
         public MovementTank move;
         public MovementOponent move_oponent;
-       
+
         public string side_rotate_oponent { get; set; }
         //Creating Bots or Oponents;
         Creating_oponent creating = new Creating_oponent();
         //Creating Bots or Oponents;
-
+        //Initial Bot
+        private Bot bot;
+        //Initial Bot
         private readonly HashSet<Key> pressedKeysTank1 = new HashSet<Key>();
         private readonly HashSet<Key> pressedKeysTank2 = new HashSet<Key>();
+
         private DispatcherTimer tank1Timer;
         private DispatcherTimer tank2Timer;
         private DispatcherTimer fireTimer;
         protected DispatcherTimer Clear_Killed_Tank;
+        public Timer refresh_bot_timer;
 
         private bool canShoot = true;
         private bool canShootMouse = true;
@@ -81,7 +87,7 @@ namespace Wpf_Cursova
         {
             InitializeComponent();
             pause_game.MouseLeftButtonDown += Pause_game_MouseLeftButtonDown;
-            
+
         }
 
         private void Pause_game_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -92,79 +98,122 @@ namespace Wpf_Cursova
 
         private void WindowKeyDown(object sender, KeyEventArgs e)
         {
+            if (Type_of_Game == "Гра на двох")
+            {
+                if (IsTank1Key(e.Key))
+                {
+                    list_key_tank1.Add(e.Key);
+                    lock (pressedKeysTank1)
+                    {
+                        if (list_key_tank1.Count != 1)
+                        {
+                            if (list_key_tank1[list_key_tank1.Count - 1] == list_key_tank1[list_key_tank1.Count - 2])
+                            {
+                                pressedKeysTank1.Add(e.Key);
+                            }
+                            else
+                            {
+                                pressedKeysTank1.Clear();
+                                pressedKeysTank1.Add(e.Key);
+                            }
+                        }
+                        else
+                        {
+                            pressedKeysTank1.Add(e.Key);
+                        }
+                    }
+                }
+                else if (IsTank2Key(e.Key))
+                {
+                    list_key_tank2.Add(e.Key);
+                    lock (pressedKeysTank2)
+                    {
+                        if (list_key_tank2.Count != 1)
+                        {
+                            if (list_key_tank2[list_key_tank2.Count - 1] == list_key_tank2[list_key_tank2.Count - 2])
+                            {
+                                pressedKeysTank2.Add(e.Key);
+                            }
+                            else
+                            {
+                                pressedKeysTank2.Clear();
+                                pressedKeysTank2.Add(e.Key);
+                            }
+                        }
+                        else
+                        {
+                            pressedKeysTank2.Add(e.Key);
+                        }
+                    }
+                }
+                else if (e.Key == Key.Space)
+                {
 
-            if (IsTank1Key(e.Key))
+                    Do_Fire_By_Space();
+
+                }
+            }
+            else
             {
-                list_key_tank1.Add(e.Key);
-                lock (pressedKeysTank1)
+                if (IsTank1Key(e.Key))
                 {
-                    if (list_key_tank1.Count != 1)
+                    list_key_tank1.Add(e.Key);
+                    lock (pressedKeysTank1)
                     {
-                        if (list_key_tank1[list_key_tank1.Count - 1] == list_key_tank1[list_key_tank1.Count - 2])
+                        if (list_key_tank1.Count != 1)
                         {
-                            pressedKeysTank1.Add(e.Key);
+                            if (list_key_tank1[list_key_tank1.Count - 1] == list_key_tank1[list_key_tank1.Count - 2])
+                            {
+                                pressedKeysTank1.Add(e.Key);
+                            }
+                            else
+                            {
+                                pressedKeysTank1.Clear();
+                                pressedKeysTank1.Add(e.Key);
+                            }
                         }
                         else
                         {
-                            pressedKeysTank1.Clear();
                             pressedKeysTank1.Add(e.Key);
                         }
                     }
-                    else
-                    {
-                        pressedKeysTank1.Add(e.Key);
-                    }
                 }
-            }
-            else if (IsTank2Key(e.Key))
-            {
-                list_key_tank2.Add(e.Key);
-                lock (pressedKeysTank2)
-                {
-                    if (list_key_tank2.Count != 1)
-                    {
-                        if (list_key_tank2[list_key_tank2.Count - 1] == list_key_tank2[list_key_tank2.Count - 2])
-                        {
-                            pressedKeysTank2.Add(e.Key);
-                        }
-                        else
-                        {
-                            pressedKeysTank2.Clear();
-                            pressedKeysTank2.Add(e.Key);
-                        }
-                    }
-                    else
-                    {
-                        pressedKeysTank2.Add(e.Key);
-                    }
-                }
-            }
-            else if (e.Key == Key.Space)
-            {
-                
-               Do_Fire_By_Space();
-                
             }
         }
         private void WindowKeyUp(object sender, KeyEventArgs e)
         {
-            if (IsTank1Key(e.Key))
+            if (Type_of_Game == "Гра на двох")
             {
-                lock (pressedKeysTank1)
+
+                if (IsTank1Key(e.Key))
                 {
-                    pressedKeysTank1.Remove(e.Key);
+                    lock (pressedKeysTank1)
+                    {
+                        pressedKeysTank1.Remove(e.Key);
+                    }
+                }
+
+                else if (IsTank2Key(e.Key))
+                {
+                    lock (pressedKeysTank2)
+                    {
+                        pressedKeysTank2.Remove(e.Key);
+                    }
                 }
             }
-            else if (IsTank2Key(e.Key))
+            else
             {
-                lock (pressedKeysTank2)
+                if (IsTank1Key(e.Key))
                 {
-                    pressedKeysTank2.Remove(e.Key);
+                    lock (pressedKeysTank1)
+                    {
+                        pressedKeysTank1.Remove(e.Key);
+                    }
                 }
             }
-            
+
         }
-        
+
         private bool IsTank1Key(Key key)
         {
             return key == Key.Up || key == Key.Down || key == Key.Left || key == Key.Right;
@@ -184,7 +233,7 @@ namespace Wpf_Cursova
             {
                 foreach (var key in keys)
                 {
-                    
+
                     move.my_field = my_field;
                     move.Points_denied = Points;
                     move.canvas = play_zone;
@@ -210,13 +259,13 @@ namespace Wpf_Cursova
                                 move.Press_End(my_tank);
                                 break;
                             }
-                        
+
                     }
                     damage_of_my_tank = move.damage_of_my_tank;
 
                 }
             }
-            
+
         }
         private void UpdateTank2()
         {
@@ -230,7 +279,7 @@ namespace Wpf_Cursova
                 foreach (var key in keys)
                 {
 
-                    
+
                     move_oponent.Points_denied = Points;
                     move_oponent.canvas = play_zone;
                     move_oponent.my_field = my_field;
@@ -269,7 +318,7 @@ namespace Wpf_Cursova
 
 
         // <--------------------------------------->
-        
+
         private async void Do_Fire_By_Space()
         {
             if (!canShoot) return;
@@ -278,7 +327,7 @@ namespace Wpf_Cursova
             if (oponents_tank.Count != 0)
             {
                 My_tank = my_tank;
-                
+
                 if (move.point_for_bullet.X != 0 && move.point_for_bullet.Y != 0)
                 {
                     point_bullet_to_oponent = move_oponent.point_for_bullet;
@@ -294,22 +343,27 @@ namespace Wpf_Cursova
                 bullet_oponent.GetOponents(oponents_tank);
                 bullet_oponent.GetMainTank(my_tank);
                 await Task.WhenAll(bullet_oponent.Make_a_shot());
-                
+
 
 
                 my_tank = bullet_oponent.ReturnMainTank();
+                if (my_tank == null)
+                {
+                    Result_of_Game result_Of_Game = new Result_of_Game();
+                    result_Of_Game.Name_of_winner = Name_of_player_2;
+                    result_Of_Game.Enter_Winner_Name();
+                    result_Of_Game.ShowDialog();
+                    DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                    result_Of_Game.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
+                }
                 fireTimer.Start();
-                
-                
-                
+
+
+
             }
         }
-        
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
-        {
-            
-        }
+
 
         private async void Play_zone_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -328,28 +382,25 @@ namespace Wpf_Cursova
                     Point point_center_of_tank_int_canvas = my_tank.Tank_grid.TransformToAncestor(play_zone).Transform(new Point(my_tank.Width / 2, my_tank.Height / 2));
                     point_bullet = point_center_of_tank_int_canvas;
                 }
-                if (locate_mouse != null)
+
+                Bullet bullet = new Bullet(play_zone, my_tank, locate_mouse, my_tank.Under_Muzzle_tank, point_bullet, side, muzzle_rotate.degrees_for_bullet, Points, damage_of_my_tank);
+                bullet.GetOponents(oponents_tank);
+                bullet.GetMainTank(my_tank);
+                bullet.timer = Clear_Killed_Tank;
+                bullet.creating_oponent = creating;
+                await Task.WhenAll(bullet.Make_a_shot());
+                if(oponents_tank.Count == 0)
                 {
-                    Bullet bullet = new Bullet(play_zone, my_tank, locate_mouse, my_tank.Under_Muzzle_tank, point_bullet, side, muzzle_rotate.degrees_for_bullet, Points, damage_of_my_tank);
-                    bullet.GetOponents(oponents_tank);
-                    bullet.GetMainTank(my_tank);
-                    bullet.timer = Clear_Killed_Tank;
-                    bullet.creating_oponent = creating;
-                    await Task.WhenAll(bullet.Make_a_shot());
-                    firebymouse.Start();
-                    
+                    Result_of_Game result_Of_Game = new Result_of_Game();
+                    result_Of_Game.Name_of_winner = Name_of_player_1;
+                    result_Of_Game.Enter_Winner_Name();
+                    result_Of_Game.ShowDialog();
+                    DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                    result_Of_Game.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
                 }
-                else
-                {
-                    Bullet bullet = new Bullet(play_zone, my_tank, locate_mouse, my_tank.Under_Muzzle_tank, point_bullet, side, muzzle_rotate.degrees_for_bullet, Points,damage_of_my_tank);
-                    Point temp_locate_mouse = new Point(play_zone.ActualWidth / 2, 0);
-                    bullet.GetOponents(oponents_tank);
-                    bullet.GetMainTank(my_tank);
-                    bullet.timer = Clear_Killed_Tank;
-                    bullet.creating_oponent = creating;
-                    await Task.WhenAll(bullet.Make_a_shot());
-                    firebymouse.Start();
-                }
+                firebymouse.Start();
+                
+
             }
         }
 
@@ -373,11 +424,11 @@ namespace Wpf_Cursova
 
         internal void Start_game_Click_for_two_player()
         {
-            
+            Type_of_Game = "Гра на двох";
             points_tanks = new List<Point>();
-            play_zone.Background = Brushes.DarkSlateGray;
+            play_zone.Background = Brushes.Thistle;
             oponents_tank = new List<Oponent>();
-            this.Background = Brushes.DarkGray;
+            this.Background = Brushes.Black;
             muzzle_rotate = new Battle();
             this.KeyDown += WindowKeyDown;
             this.KeyUp += WindowKeyUp;
@@ -407,7 +458,7 @@ namespace Wpf_Cursova
 
             play_zone.MouseLeftButtonDown += Play_zone_MouseLeftButtonDown;
             play_zone.MouseMove += Play_zone_MouseMove;
-            this.StateChanged += MainWindow_StateChanged;
+            
 
             //Для подальшого редагування для Start Game
             move = new MovementTank();
@@ -415,7 +466,7 @@ namespace Wpf_Cursova
             damage_of_my_tank = move.damage_of_my_tank;
             damage_of_oponent = move_oponent.damage_of_oponent;
             //Для 2-ох іграків;
-            max_number_of_oponents = 10;
+            max_number_of_oponents = 5;
             number_of_oponents_now = 0;
             //Для 2-ох іграків;
             
@@ -459,17 +510,102 @@ namespace Wpf_Cursova
         }
         internal void Start_game_for_one_player()
         {
-            MessageBoxResult result = MessageBox.Show("Покищо розробка режиму гри на одного гравця відбувається в планах!!!", "Зачекайте зовсім скоро(OK - вийти в Menu,Cancel - вийти з гри)", MessageBoxButton.OKCancel, MessageBoxImage.Information);
-            if (result == MessageBoxResult.OK)
+            //MessageBoxResult result = MessageBox.Show("Покищо розробка режиму гри на одного гравця відбувається в планах!!!", "Зачекайте зовсім скоро(OK - вийти в Menu,Cancel - вийти з гри)", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+            //if (result == MessageBoxResult.OK)
+            //{
+            //    StartMenu menu = new StartMenu();
+            //    menu.Show();
+            //    this.Close();
+            //}
+            //else if (result == MessageBoxResult.Cancel)
+            //{
+            //    this.Close();
+            //}
+            Type_of_Game = "Гра з ботом";
+            points_tanks = new List<Point>();
+            play_zone.Background = Brushes.Thistle;
+            oponents_tank = new List<Oponent>();
+            this.Background = Brushes.Black;
+            muzzle_rotate = new Battle();
+            this.KeyDown += WindowKeyDown;
+            this.KeyUp += WindowKeyUp;
+            tank1Timer = new DispatcherTimer();
+            firebymouse = new DispatcherTimer();
+            Clear_Killed_Tank = new DispatcherTimer();
+
+            tank1Timer.Interval = TimeSpan.FromMilliseconds(16);
+            firebymouse.Interval = TimeSpan.FromMilliseconds(2000);
+            Clear_Killed_Tank.Interval = TimeSpan.FromMilliseconds(10000);
+            tank1Timer.Tick += (s, e) => UpdateTank1();
+            firebymouse.Tick += (s, e) => canShootMouse = true;
+            Clear_Killed_Tank.Tick += (s, e) => Clear_Loyaut_from_oponents();
+
+            tank1Timer.Start();
+            firebymouse.Start();
+
+            play_zone.MouseLeftButtonDown += Play_zone_MouseLeftButtonDown;
+            play_zone.MouseMove += Play_zone_MouseMove;
+
+            move = new MovementTank();
+            move_oponent = new MovementOponent();
+            damage_of_my_tank = move.damage_of_my_tank;
+            damage_of_oponent = move_oponent.damage_of_oponent;
+            //Для 1-го іграка;
+            max_number_of_oponents = 5;
+            number_of_oponents_now = 0;
+            //Для 1-го іграка;
+            if (my_tank == null)
             {
-                StartMenu menu = new StartMenu();
-                menu.Show();
-                this.Close();
+                Tank tank = new Tank();
+                tank.canvas = play_zone;
+                tank.points_of_tanks = points_tanks;
+                tank.Initial_grid_tank();
+                my_tank = tank;
+                grid_tank = tank.Tank_grid;
+                muzzle_rotate.ActualWidth_Up_Muzzle = my_tank.UP_Muzzle_tank.ActualWidth;
+                muzzle_rotate.ActualHeight_Up_Muzzle = my_tank.UP_Muzzle_tank.ActualHeight;
+                Point topLeftInGrid_Under_muzzle = my_tank.Under_Muzzle_tank.TransformToAncestor(grid_tank).Transform(new Point(0, 0));
+                my_tank.CenterUnderMuzzle = my_tank.Under_Muzzle_tank.TransformToAncestor(play_zone).Transform(topLeftInGrid_Under_muzzle);
+                Point topLeftInGrid_Up_muzzle = my_tank.UP_Muzzle_tank.TransformToAncestor(grid_tank).Transform(new Point(0, 0));
+                my_tank.CenterUpMuzzle = my_tank.UP_Muzzle_tank.TransformToAncestor(play_zone).Transform(topLeftInGrid_Up_muzzle);
             }
-            else if (result == MessageBoxResult.Cancel)
+            Field field = new Field(play_zone);
+            Texture_image = new List<Image>();
+            Texture_image = field.Texture;
+            field.points_for_my_tank = points_for_my_tank;
+            field.points_for_oponent = points_for_oponent;
+            field.oponents = oponents_tank;
+            field.My_Tank = my_tank;
+            field.Initial_field();
+
+            Points = field.GetAllPoints();
+
+            my_field = field;
+            play_zone.UpdateLayout();
+
+            //OPONENTS
+            creating.oponents_tank = oponents_tank;
+            creating.Points = this.Points;
+            creating.play_zone = this.play_zone;
+            creating.max_number_of_oponents = this.max_number_of_oponents;
+            creating.number_of_oponents_now = this.number_of_oponents_now;
+            creating.BackGroundCreatingBots();
+            //Initialization bot
+            Initial_Bot();
+        }
+        public void Initial_Bot()
+        {
+            bot = new Bot(my_field,oponents_tank,my_tank,move_oponent,Points,play_zone);
+
+            TimerCallback timerCallBack = new TimerCallback(OnTimerEvent);
+            refresh_bot_timer = new Timer(timerCallBack,null,0,16);
+        }
+        public void OnTimerEvent(object state)
+        {
+            Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                this.Close();
-            }
+                bot.Refresh_information_to_bot();
+            });
         }
         internal void Start_game_for_multiplayer()
         {

@@ -23,3 +23,7 @@ D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfAnimatedGif.pdb
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\bin\Debug\WpfAnimatedGif.xml
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\PauseGame.g.cs
 D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\PauseGame.baml
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\Result_of_Game.g.cs
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\Result_of_Game.baml
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\EnterInformationGamer.g.cs
+D:\My Homework\Cursova\Cursova_program\Wpf_Cursova\obj\Debug\EnterInformationGamer.baml

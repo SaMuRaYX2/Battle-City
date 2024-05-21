@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfAnimatedGif;
+using System.Windows.Media.Animation;
 
 
 namespace Wpf_Cursova
@@ -31,35 +32,72 @@ namespace Wpf_Cursova
             start_game_two_player.MouseLeftButtonDown += Start_game_two_player_MouseLeftButtonDown;
             start_game_one_player.MouseLeftButtonDown += Start_game_one_player_MouseLeftButtonDown;
             start_multiplayer.MouseLeftButtonDown += Start_multiplayer_MouseLeftButtonDown;
+            grid_of_window.MouseLeftButtonDown += Grid_of_window_MouseLeftButtonDown;
+        }
+
+        private void Grid_of_window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
         }
 
         private void Start_multiplayer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
-            mainWindow.Start_game_for_multiplayer();
-            this.Close();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.5));
+            fadeOutAnimation.Completed += (s, a) =>
+            {
+                mainWindow.Show();
+                this.Close();
+                DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                mainWindow.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
+                mainWindow.Start_game_for_multiplayer();
+            };
+            this.BeginAnimation(Window.OpacityProperty, fadeOutAnimation);
         }
 
         private void Start_game_one_player_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
-            mainWindow.Start_game_for_one_player();
-            this.Close();
+            EnterInformationGamer enterInformationGamer = new EnterInformationGamer();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.5));
+            fadeOutAnimation.Completed += (s, a) =>
+            {
+                enterInformationGamer.Show();
+                enterInformationGamer.player_2.Text = "You choose game for one";
+                enterInformationGamer.player_2.IsReadOnly = true;
+                enterInformationGamer.Type_of_game = "Гра з ботом";
+                this.Close();
+                DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                enterInformationGamer.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
+            };
+            this.BeginAnimation(Window.OpacityProperty, fadeOutAnimation);
         }
 
         private void Start_game_two_player_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
-            mainWindow.Start_game_Click_for_two_player();
-            this.Close();
+            EnterInformationGamer enterInformationGamer = new EnterInformationGamer();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.5));
+            fadeOutAnimation.Completed += (s, a) =>
+            {
+                enterInformationGamer.Show();
+                enterInformationGamer.Type_of_game = "Гра на двох";
+                this.Close();
+                DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                enterInformationGamer.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
+            };
+            this.BeginAnimation(Window.OpacityProperty, fadeOutAnimation);
         }
 
         private void Exit_game_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.Close();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1));
+            fadeOutAnimation.Completed += (s, a) =>
+            {
+                this.Close();
+            };
+            this.BeginAnimation(Window.OpacityProperty, fadeOutAnimation);
         }
 
         private void StartMenu_Activated(object sender, EventArgs e)

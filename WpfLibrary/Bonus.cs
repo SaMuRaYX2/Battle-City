@@ -82,7 +82,7 @@ namespace WpfLibrary
                     img = new Image();
                     while (img.Source == null)
                     {
-                        int random_position = rand_of_position.Next(EmptyRow.Count);
+                        int random_position = rand_of_position.Next(EmptyRow.Count/2,EmptyRow.Count);
                         int random_bonus = rand_of_bonus.Next(1, 10);
                         if (random_bonus == 1)
                         {
