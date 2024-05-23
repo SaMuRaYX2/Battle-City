@@ -13,34 +13,38 @@ namespace WpfLibrary
 {
     public class Bullet_Oponent : Bullet
     {
-        public Bullet_Oponent(Canvas canvas, Oponent my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage) : base(canvas, my_tank, locate_mouse, UP_muzzle, point_center_tank, side, degrees, Points, damage)
+        public bool bot_type { get; set; }
+        public Bullet_Oponent(Canvas canvas, Oponent my_tank, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage) : base(canvas, my_tank, UP_muzzle, point_center_tank, side, degrees, Points, damage)
         {
 
         }
 
         public override async Task Make_a_shot()
         {
-            RotateTransform rotate = new RotateTransform();
-            if(side_of_rotate_tank == "UP")
+            RotateTransform rotate = new RotateTransform(degrees);
+            if (bot_type == false)
             {
-                rotate.Angle = 0;
-                degrees = 0;
-            }
-            else if(side_of_rotate_tank == "DOWN")
-            {
-                rotate.Angle = 180;
-                degrees = 180;
-            }
-            else if(side_of_rotate_tank == "LEFT")
-            {
-                rotate.Angle = -90;
-                degrees = -90;
-            }
-            else if(side_of_rotate_tank == "RIGHT")
-            {
-                rotate.Angle = 90;
-                degrees = 90;
+                if (side_of_rotate_tank == "UP")
+                {
+                    rotate.Angle = 0;
+                    degrees = 0;
+                }
+                else if (side_of_rotate_tank == "DOWN")
+                {
+                    rotate.Angle = 180;
+                    degrees = 180;
+                }
+                else if (side_of_rotate_tank == "LEFT")
+                {
+                    rotate.Angle = -90;
+                    degrees = -90;
+                }
+                else if (side_of_rotate_tank == "RIGHT")
+                {
+                    rotate.Angle = 90;
+                    degrees = 90;
 
+                }
             }
             Point position_of_bullet;
             double offsetY = - My_tank.Height;

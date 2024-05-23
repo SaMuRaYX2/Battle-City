@@ -328,7 +328,7 @@ namespace Wpf_Cursova
             {
                 My_tank = my_tank;
 
-                if (move.point_for_bullet.X != 0 && move.point_for_bullet.Y != 0)
+                if (move_oponent.point_for_bullet.X != 0 && move_oponent.point_for_bullet.Y != 0)
                 {
                     point_bullet_to_oponent = move_oponent.point_for_bullet;
                 }
@@ -339,7 +339,7 @@ namespace Wpf_Cursova
                 }
                 side_rotate_oponent = move_oponent.side_of_move;
 
-                Bullet_Oponent bullet_oponent = new Bullet_Oponent(play_zone, oponents_tank[0], locate_mouse, oponents_tank[0].Under_Muzzle_tank, point_bullet_to_oponent, side_rotate_oponent, 0, Points, damage_of_oponent);
+                Bullet_Oponent bullet_oponent = new Bullet_Oponent(play_zone, oponents_tank[0], oponents_tank[0].Under_Muzzle_tank, point_bullet_to_oponent, side_rotate_oponent, 0, Points, damage_of_oponent);
                 bullet_oponent.GetOponents(oponents_tank);
                 bullet_oponent.GetMainTank(my_tank);
                 await Task.WhenAll(bullet_oponent.Make_a_shot());
@@ -383,7 +383,7 @@ namespace Wpf_Cursova
                     point_bullet = point_center_of_tank_int_canvas;
                 }
 
-                Bullet bullet = new Bullet(play_zone, my_tank, locate_mouse, my_tank.Under_Muzzle_tank, point_bullet, side, muzzle_rotate.degrees_for_bullet, Points, damage_of_my_tank);
+                Bullet bullet = new Bullet(play_zone, my_tank, my_tank.Under_Muzzle_tank, point_bullet, side, muzzle_rotate.degrees_for_bullet, Points, damage_of_my_tank);
                 bullet.GetOponents(oponents_tank);
                 bullet.GetMainTank(my_tank);
                 bullet.timer = Clear_Killed_Tank;
@@ -417,7 +417,7 @@ namespace Wpf_Cursova
                     side = "nothing";
                 }
                 locate_mouse = e.GetPosition(play_zone);
-                muzzle_rotate.Rotate_muzzle(locate_mouse, my_tank, play_zone, grid_tank, side);
+                muzzle_rotate.Rotate_muzzle(locate_mouse, my_tank, play_zone, side);
             }
             
         }
@@ -595,7 +595,8 @@ namespace Wpf_Cursova
         }
         public void Initial_Bot()
         {
-            bot = new Bot(my_field,oponents_tank,my_tank,move_oponent,Points,play_zone);
+            
+            bot = new Bot(my_field,oponents_tank,my_tank,move_oponent,Points,play_zone,damage_of_oponent);
 
             TimerCallback timerCallBack = new TimerCallback(OnTimerEvent);
             refresh_bot_timer = new Timer(timerCallBack,null,0,16);
@@ -604,8 +605,20 @@ namespace Wpf_Cursova
         {
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
+                if (bot.test_to_finish_game == true)
+                {
+                    refresh_bot_timer.Dispose();
+                    Result_of_Game result_Of_Game = new Result_of_Game();
+                    result_Of_Game.Name_of_winner = Name_of_player_2;
+                    result_Of_Game.Enter_Winner_Name();
+                    result_Of_Game.ShowDialog();
+                    DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
+                    result_Of_Game.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
+                }
                 bot.Refresh_information_to_bot();
+                
             });
+            
         }
         internal void Start_game_for_multiplayer()
         {

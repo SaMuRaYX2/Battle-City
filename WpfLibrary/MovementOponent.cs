@@ -16,7 +16,7 @@ namespace WpfLibrary
 
         //}
         
-        private double speed_of_tank = 3;
+        public double speed_of_tank = 3;
         bool initialization_of_timer = false;
         public int damage_of_oponent = 25;
         public void Press_W(Oponent my_tank)

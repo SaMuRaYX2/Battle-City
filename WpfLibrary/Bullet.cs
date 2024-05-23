@@ -40,7 +40,7 @@ namespace WpfLibrary
         {
             return this.Tank;
         }
-        public Bullet(Canvas canvas, Tank my_tank, Point locate_mouse, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage)
+        public Bullet(Canvas canvas, Tank my_tank, Shape UP_muzzle, Point point_center_tank, string side, double degrees, List<Point> Points, int damage)
         {
             this.damage = damage;
             points_denied = Points;
@@ -57,7 +57,7 @@ namespace WpfLibrary
             }
             Play_zone = canvas;
             My_tank = my_tank;
-            Locate_mouse = locate_mouse;
+            //Locate_mouse = locate_mouse;
             double width_one_row = grid_bullet.Width / grid_bullet.ColumnDefinitions.Count;
             double height_one_column = grid_bullet.Height / grid_bullet.RowDefinitions.Count;
             Path path = new Path();

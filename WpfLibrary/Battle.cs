@@ -21,7 +21,7 @@ namespace WpfLibrary
         public double ActualWidth_Up_Muzzle { get; set; }
         public double ActualHeight_Up_Muzzle { get; set; }
         public double degrees_for_bullet { get; set; }
-        public void Rotate_muzzle(Point locate_mouse, Tank my_tank,Canvas canvas,Grid grid_tank,string side)
+        public void Rotate_muzzle(Point locate_mouse, Tank my_tank,Canvas canvas,string side)
         {
             MouseX = locate_mouse.X;
             MouseY = locate_mouse.Y;
