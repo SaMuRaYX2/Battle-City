@@ -11,6 +11,7 @@ namespace WpfLibrary
 {
     public class Oponent : Tank
     {
+        
         public Oponent() : base()
         {
             list_of_oponents = new List<Oponent>();
@@ -23,11 +24,11 @@ namespace WpfLibrary
         {
             double play_zone_width = canvas.ActualWidth;
             double play_zone_height = canvas.ActualHeight;
-            PositionY = 100;
+            PositionY = 80;
             int index = 0;
             bool test_to_find_point = true;
             List<Point> point_to_test = new List<Point>();
-            for (int i = 150; i < play_zone_width - 100 && index < list_of_oponents.Count; i += 150, index++)
+            for (int i = 160; i < play_zone_width - 100 && index < list_of_oponents.Count; i += 160, index++)
             {
                 test_to_find_point = true;
                 PositionX = i;

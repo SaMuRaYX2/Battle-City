@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -8,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using NAudio.Wave;
 
 namespace WpfLibrary
 {
@@ -25,9 +27,11 @@ namespace WpfLibrary
         public Timer movement_timer;
         public Timer rotate_muzzle_timer;
         public Timer refresh_way_timer;
+        public Timer timer_refresh_point_of_tanks;
         private bool shouldContinue_rotate = true;
-        private bool allow_to_refresh = true;
-        private bool allow_move = true;
+        private bool allow_to_update = false;
+        private bool allow_move = false;
+        private bool allow_to_refresh = false;
         public Tank my_tank { get; set; }
         private MovementOponent move_bot;
         public List<Point> Texture_point { get; set; }
@@ -37,47 +41,112 @@ namespace WpfLibrary
         public int damage { get; set; }
 
         public bool test_to_finish_game = false;
+        public bool test_to_exit_pauseGame = false;
 
         private bool test_to_visible_my_tank = false;
         public List<List<Point>> all_ways_to_my_tank_by_center_point;
         public List<Point> temp_list_to_all_list;
+        public List<Point> the_best_way;
         public List<int> mass_of_move;
         public int iteration_of_move;
+        bool first_start_to_find_empty_row_and_column = false;
+        List<int> previous_mass_of_move_count;
+        bool first_iteration = true;
+        bool test_to_allow_changing_EmptyCell = false;
+        WaveOutEvent waveOut_oponent;
+        AudioFileReader audioFileReader_oponent;
+        private bool sound_oponent_finish = true;
+
+        public void PlayShotOponents()
+        {
+            if (sound_oponent_finish == true)
+            {
+                sound_oponent_finish = false;
+                audioFileReader_oponent = new AudioFileReader("D:\\My Homework\\Cursova\\Texture_image\\boom8.wav");
+                waveOut_oponent = new WaveOutEvent();
+                waveOut_oponent.PlaybackStopped += WaveOut_oponent_PlaybackStopped;
+                waveOut_oponent.Init(audioFileReader_oponent);
+                waveOut_oponent.Play();
+            }
+
+        }
+
+        private void WaveOut_oponent_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            audioFileReader_oponent.Dispose();
+            waveOut_oponent.Dispose();
+            sound_oponent_finish = true;
+        }
 
         public Bot(Field field,List<Oponent> list_oponents,Tank my_tank,MovementOponent move_oponent,List<Point> Points,Canvas play_zone,int damage_of_oponents)
         {
+            
+            previous_mass_of_move_count = new List<int>();
             this.damage = damage_of_oponents;
             battle = new Battle();
             Texture_point = Points;
             canvas = play_zone;
             Center_of_cell_field = new List<Point>();
             this.move_bot = move_oponent;
+            move_bot.IsOponentBot = true;
             this.my_tank = my_tank;
             this.field_of_playground = field;
             EmptyRow = field_of_playground.EmptyRow;
             EmptyColumn = field_of_playground.EmptyColumn;
             grid_field = field.Grid_field;
             Find_Center_of_cell_field();
+            
             oponents = new List<Oponent>();
             this.oponents = list_oponents;
+            //First iteration of timer
+            Refresh_information_to_bot();
+            UpdateWayToMyTank();
+            //Movement timer
             TimerCallback timerCallback_move = new TimerCallback(Movement_timer);
-            movement_timer = new Timer(timerCallback_move, null, 2000, 20);
+            movement_timer = new Timer(timerCallback_move, null, 0, 80);
+            //Rotate muzzle timer
             TimerCallback timerCallBack_muzzle = new TimerCallback(Rotate_Muzzle_timer);
-            rotate_muzzle_timer = new Timer(timerCallBack_muzzle, null, 1000, 2000);
+            rotate_muzzle_timer = new Timer(timerCallBack_muzzle, null, 0, 1400);
+            //Find_way_to_my_tank timer
             TimerCallback timerRefresh_way = new TimerCallback(Update_way_timer);
-            refresh_way_timer = new Timer(timerRefresh_way, null, 1000, 30000);
+            refresh_way_timer = new Timer(timerRefresh_way, null, 100, 5000);
+            //Refresh some points timer
+            TimerCallback timerCallback_refresh_position = new TimerCallback(Refresh_some_point_of_tanks);
+            timer_refresh_point_of_tanks = new Timer(timerCallback_refresh_position, null, 0, 16);
+        }
+
+        public void Refresh_some_point_of_tanks(object state)
+        {
+            if (test_to_exit_pauseGame == false)
+            {
+                if (oponents.Count != 0 && my_tank != null)
+                {
+                    if (allow_to_refresh == true)
+                    {
+                        Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            if (test_to_allow_changing_EmptyCell == true)
+                            {
+                                Refresh_information_to_bot();
+                            }
+                            //Refresh_information_to_bot();
+                        });
+
+                    }
+                }
+            }
         }
         public void Update_way_timer(object state)
         {
-            if (allow_to_refresh == true)
+            if (allow_to_update == true)
             {
-                Task.Run(() =>
+                if (first_start_to_find_empty_row_and_column == true)
                 {
-                    allow_move = false;
-                    UpdateWayToMyTank();
-                    allow_to_refresh = false;
-                    allow_move = true;
-                });
+                    Task.Run(() =>
+                    {
+                        UpdateWayToMyTank();
+                    });
+                }
             }
         }
         public void Movement_timer(object state)
@@ -86,24 +155,53 @@ namespace WpfLibrary
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    Move_bot(mass_of_move[iteration_of_move]);
-                    iteration_of_move++;
+                    if (iteration_of_move < mass_of_move.Count)
+                    {
+                        allow_to_update = false;
+                        Move_bot(mass_of_move[iteration_of_move]);
+                        iteration_of_move++;
+
+                    }
+                    if (iteration_of_move == mass_of_move.Count)
+                    {
+
+                        allow_to_update = true;
+                    }
                 });
+
             }
         }
         public void Rotate_Muzzle_timer(object state)
         {
             if (shouldContinue_rotate)
             {
-                Task.Delay(1000);
                 Task.Run(() =>
                 {
+                    //Task.Delay(4000);
                     Test_to_Fire();
                 });
+                
             }
         }
         public void Refresh_information_to_bot()
         {
+            //allow_to_update = false;
+            //allow_to_refresh = false;
+            canvas.UpdateLayout();
+            if (oponents.Count != 0)
+            {
+                if (first_start_to_find_empty_row_and_column == false)
+                {
+                    field_of_playground.first_iteration_to_find_empty_cell = false;
+                    field_of_playground.Find_Empty_Field();
+                }
+                else
+                {
+                    field_of_playground.Find_Empty_Field();
+                }
+
+                first_start_to_find_empty_row_and_column = true;
+            }
             double PositionX = oponents[0].PositionX;
             double PositionY = oponents[0].PositionY;
             double WidthOponent = oponents[0].Width;
@@ -132,154 +230,687 @@ namespace WpfLibrary
                 Point topLeftInGrid_Up_muzzle = oponents[0].UP_Muzzle_tank.TransformToAncestor(oponents[0].Tank_grid).Transform(new Point(0, 0));
                 oponents[0].CenterUpMuzzle = oponents[0].UP_Muzzle_tank.TransformToAncestor(canvas).Transform(topLeftInGrid_Up_muzzle);
             }
+
+            //allow_to_update = true;
+            //allow_to_refresh = false;
         }
+        
         
         public void Move_bot(int i)
         {
-            allow_to_refresh = false;
-            move_bot.Points_denied = Texture_point;
-            move_bot.canvas = canvas;
-            move_bot.my_field = field_of_playground;
-            switch (i)
+
+            if (oponents.Count != 0)
             {
-                case 1:
-                    {
-                        move_bot.Press_W(oponents[0]);
-                        side_of_move = "UP";
-                        break;
-                    }
-                case 2:
-                    {
-                        move_bot.Press_S(oponents[0]);
-                        side_of_move = "DOWN";
-                        break;
-                    }
-                case 3:
-                    {
-                        move_bot.Press_D(oponents[0]);
-                        side_of_move = "RIGHT";
-                        break;
-                    }
-                case 4:
-                    {
-                        move_bot.Press_A(oponents[0]);
-                        side_of_move = "LEFT";
-                        break;
-                    }
+                move_bot.Points_denied = Texture_point;
+                move_bot.canvas = canvas;
+                move_bot.my_field = field_of_playground;
+                switch (i)
+                {
+                    case 1:
+                        {
+                            move_bot.Press_W(oponents[0]);
+                            side_of_move = "UP";
+                            break;
+                        }
+                    case 2:
+                        {
+                            move_bot.Press_S(oponents[0]);
+                            side_of_move = "DOWN";
+                            break;
+                        }
+                    case 3:
+                        {
+                            move_bot.Press_D(oponents[0]);
+                            side_of_move = "RIGHT";
+                            break;
+                        }
+                    case 4:
+                        {
+                            move_bot.Press_A(oponents[0]);
+                            side_of_move = "LEFT";
+                            break;
+                        }
+                }
+
             }
-            allow_to_refresh = true;
 
         }
         public void UpdateWayToMyTank()
         {
+            test_to_allow_changing_EmptyCell = false;
+            allow_move = false;
+            allow_to_refresh = false;
+            allow_to_update = false;
             iteration_of_move = 0;
             List<int> bot_position_on_grid = Find_Cell_from_Point_in_Grid(Center_of_bot, Center_of_my_tank);
             int bot_row = bot_position_on_grid[0];
             int bot_column = bot_position_on_grid[1];
             int my_row = bot_position_on_grid[2];
             int my_column = bot_position_on_grid[3];
-            int number_of_way = 1;
+            int number_of_way = 5;
             all_ways_to_my_tank_by_center_point = new List<List<Point>>();
+            the_best_way = new List<Point>();
             mass_of_move = new List<int>();
             if (Center_of_bot.Y < Center_of_my_tank.Y)
             {
-                while (number_of_way != 0) {
+
+                while (number_of_way != 0)
+                {
                     number_of_way--;
                     int start_row = bot_row;
                     int start_column = bot_column;
                     temp_list_to_all_list = new List<Point>();
-                    while (start_row != my_row && start_column != my_column) {
-                        bool test_to_row = true;
-                        bool test_to_column = true;
-                        while (test_to_row == true && start_row < my_row)
+
+                    bool test_to_row = true;
+                    bool test_to_column = true;
+                    Random rnd = new Random();
+                    //IF rnd < 50 move is left;
+                    //IF rnd >=50 move if right;
+                    int type_to_move = rnd.Next(100);
+                    while (test_to_row == true && start_row < my_row)
+                    {
+                        test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                    }
+
+
+                    bool test_to_top = false;
+                    bool rand_choose_right;
+                    bool rand_choose_left;
+                    if (type_to_move < 50)
+                    {
+                        rand_choose_right = false;
+                        rand_choose_left = true;
+                    }
+                    else
+                    {
+                        rand_choose_right = true;
+                        rand_choose_left = false;
+                    }
+
+
+
+                    while (start_row != my_row || start_column != my_column)
+                    {
+                        while (start_row < my_row)
                         {
-                            test_to_row = Try_to_move_down(ref start_row, ref start_column);
-                        }
-                        test_to_row = true;
-                        bool test_to_left = true;
-                        bool test_to_right = true;
-                        while (test_to_left == true || test_to_right == true)
-                        {
-                            int choose_some_way = 0;
-                            if (test_to_right == true && test_to_left == true)
+                            if (test_to_top == false)
                             {
-                                Random rnd = new Random();
-                                choose_some_way = rnd.Next(101);
+                                test_to_row = true;
+                                test_to_column = true;
                             }
-                            else if (test_to_right == false && test_to_left == true)
+                            if (test_to_top == false)
                             {
-                                choose_some_way = 80;
+                                test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                test_to_top = false;
                             }
-                            else if (test_to_left == false && test_to_right == true)
+                            
+                            if (test_to_row == true && start_column < my_column)
                             {
-                                choose_some_way = 10;
-                            }
-                            if (choose_some_way <= 50)
-                            {
-                                int current_row = start_row;
-                                while (test_to_row == true || test_to_column == true)
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
                                 {
-                                    if (start_row < my_row)
+                                    test_to_top = false;
+                                }
+                                
+                            }
+                            else if (test_to_row == true && start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if(test_to_column == true)
+                                {
+                                    test_to_top = false;
+                                }
+                                
+                            }
+                            if(test_to_top == true)
+                            {
+                                test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                test_to_top = true;
+                            }
+
+                            if (test_to_row == false)
+                            {
+
+                                test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                if (rand_choose_right == true)
+                                {
+
+                                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                    if (test_to_column == false)
                                     {
-                                        test_to_row = true;
-                                        test_to_column = true;
-                                        test_to_column = Try_to_move_right(ref start_row, ref start_column);
-                                        test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                        rand_choose_right = false;
+                                        rand_choose_left = true;
                                     }
+
                                 }
-                                if(current_row == start_row)
+                                else if (rand_choose_left == true)
                                 {
-                                    test_to_right = false;
-                                }
-                            }
-                            else
-                            {
-                                int current_row = start_row;
-                                while (test_to_row == true || test_to_column == true)
-                                {
-                                    if (start_row != my_row)
+
+                                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                    if (test_to_column == false)
                                     {
-                                        test_to_row = true;
-                                        test_to_column = true;
-                                        test_to_column = Try_to_move_left(ref start_row, ref start_column);
-                                        test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                        rand_choose_left = false;
+                                        rand_choose_right = true;
                                     }
-                                }
-                                if(current_row == start_row)
-                                {
-                                    test_to_left = false;
+
                                 }
 
                             }
+                            //Допрацювати цей код точніше;
+                            //else if (test_to_row == false && test_to_column == false)
+                            //{
+                            //    while (test_to_column == false)
+                            //    {
+                            //        test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                            //        if (start_column < my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_right(ref start_row, ref start_column);
+
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = true;
+                            //                rand_choose_left = false;
+                            //            }
+                            //        }
+                            //        else if (start_column > my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = false;
+                            //                rand_choose_left = true;
+                            //            }
+                            //        }
+                            //        if (test_to_row == false)
+                            //        {
+                            //            while (test_to_row = Try_to_move_down(ref start_row, ref start_column) == true || test_to_column == true)
+                            //            {
+                            //                if (start_column < my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //                }
+                            //                else if (start_column > my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                            //                }
+                            //            }
+                            //        }
+
+                            //    }
+                            //}
+
                         }
+                        while (start_row == my_row && start_column != my_column)
+                        {
+                            test_to_column = false;
+                            if (start_column < my_column)
+                            {
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = true;
+                                    rand_choose_left = false;
+                                }
+                            }
+                            else if (start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_left = true;
+                                    rand_choose_right = false;
+                                }
+                            }
+                            if (test_to_column == false)
+                            {
+                                test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                if (test_to_row == false)
+                                {
+                                    test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                    test_to_top = true;
+                                }
+                            }
+                        }
+                        while (start_row > my_row)
+                        {
+                            
+
+                            if (start_column < my_column)
+                            {
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = true;
+                                    rand_choose_left = false;
+                                }
+
+                            }
+                            else if (start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = false;
+                                    rand_choose_left = true;
+                                }
+
+                            }
+
+                            if (start_column != my_column)
+                            {
+                                if (test_to_column == false)
+                                {
+                                    test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                }
+                                if (test_to_column == true)
+                                {
+                                    test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                }
+                            }
+                            else if(start_column == my_column)
+                            {
+                                test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                            }
+                            if (test_to_row == false)
+                            {
+
+                                while (test_to_row == false)
+                                {
+                                    if (rand_choose_left == true)
+                                    {
+                                        test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                        if (test_to_column == false)
+                                        {
+                                            rand_choose_left = false;
+                                            rand_choose_right = true;
+                                        }
+                                    }
+                                    else if (rand_choose_right == true)
+                                    {
+                                        test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                        if (test_to_column == false)
+                                        {
+                                            rand_choose_right = false;
+                                            rand_choose_left = true;
+                                        }
+                                    }
+                                    test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                }
+
+
+
+                            }
+
+
+
+
+                            //Допрацювати даний код
+                            //else if (test_to_row == false && test_to_column == false)
+                            //{
+                            //    while (test_to_column == false)
+                            //    {
+                            //        test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                            //        if (start_column < my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_right(ref start_row, ref start_column);
+
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = true;
+                            //                rand_choose_left = false;
+                            //            }
+                            //        }
+                            //        else if (start_column > my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = false;
+                            //                rand_choose_left = true;
+                            //            }
+                            //        }
+                            //        if (test_to_row == false)
+                            //        {
+                            //            while (test_to_row = Try_to_move_down(ref start_row, ref start_column) == true || test_to_column == true)
+                            //            {
+                            //                if (start_column < my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //                }
+                            //                else if (start_column > my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                            //                }
+                            //            }
+                            //        }
+
+                            //    }
+                            //}
+                        }
+
                     }
                     all_ways_to_my_tank_by_center_point.Add(temp_list_to_all_list);
+
                 }
             }
-            //else if(Center_of_bot.Y > Center_of_my_tank.Y)
-            //{
-            //    if (Center_of_bot.X < Center_of_my_tank.X)
-            //    {
+            else if (Center_of_bot.Y > Center_of_my_tank.Y)
+            {
+                while (number_of_way != 0)
+                {
+                    number_of_way--;
+                    int start_row = bot_row;
+                    int start_column = bot_column;
+                    temp_list_to_all_list = new List<Point>();
 
-            //    }
-            //    else if (Center_of_bot.X > Center_of_my_tank.X)
-            //    {
+                    bool test_to_row = true;
+                    bool test_to_column = true;
+                    Random rnd = new Random();
+                    //IF rnd < 50 move is left;
+                    //IF rnd >=50 move if right;
+                    int type_to_move = rnd.Next(100);
+                    while (test_to_row == true && start_row > my_row)
+                    {
+                        test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                    }
 
-            //    }
-            //}
+
+                    bool test_to_down = false;
+                    bool rand_choose_right;
+                    bool rand_choose_left;
+                    if (type_to_move < 50)
+                    {
+                        rand_choose_right = false;
+                        rand_choose_left = true;
+                    }
+                    else
+                    {
+                        rand_choose_right = true;
+                        rand_choose_left = false;
+                    }
 
 
+
+                    while (start_row != my_row || start_column != my_column)
+                    {
+                        while (start_row > my_row)
+                        {
+                            if (test_to_down == false)
+                            {
+                                test_to_row = true;
+                                test_to_column = true;
+                            }
+                            if (test_to_down == false)
+                            {
+                                test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                test_to_down = false;
+                            }
+                            
+                            if (test_to_row == true && start_column < my_column)
+                            {
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    test_to_down = false;
+                                }
+
+                            }
+                            else if (test_to_row == true && start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    test_to_down = false;
+                                }
+
+                            }
+                            if (test_to_down == true)
+                            {
+                                test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                test_to_down = true;
+                            }
+
+                            if (test_to_row == false)
+                            {
+
+                                test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                if (rand_choose_right == true)
+                                {
+
+                                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                    if (test_to_column == false)
+                                    {
+                                        rand_choose_right = false;
+                                        rand_choose_left = true;
+                                    }
+
+                                }
+                                else if (rand_choose_left == true)
+                                {
+
+                                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                    if (test_to_column == false)
+                                    {
+                                        rand_choose_left = false;
+                                        rand_choose_right = true;
+                                    }
+
+                                }
+
+                            }
+                            //Допрацювати цей код точніше;
+                            //else if (test_to_row == false && test_to_column == false)
+                            //{
+                            //    while (test_to_column == false)
+                            //    {
+                            //        test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                            //        if (start_column < my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_right(ref start_row, ref start_column);
+
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = true;
+                            //                rand_choose_left = false;
+                            //            }
+                            //        }
+                            //        else if (start_column > my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = false;
+                            //                rand_choose_left = true;
+                            //            }
+                            //        }
+                            //        if (test_to_row == false)
+                            //        {
+                            //            while (test_to_row = Try_to_move_down(ref start_row, ref start_column) == true || test_to_column == true)
+                            //            {
+                            //                if (start_column < my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //                }
+                            //                else if (start_column > my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                            //                }
+                            //            }
+                            //        }
+
+                            //    }
+                            //}
+
+                        }
+                        while (start_row == my_row && start_column != my_column)
+                        {
+                            test_to_column = false;
+                            if (start_column < my_column)
+                            {
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = true;
+                                    rand_choose_left = false;
+                                }
+                            }
+                            else if (start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_left = true;
+                                    rand_choose_right = false;
+                                }
+                            }
+                            if (test_to_column == false)
+                            {
+                                test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                if (test_to_row == false)
+                                {
+                                    test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                    test_to_down = true;
+                                }
+                            }
+                        }
+                        while (start_row < my_row)
+                        {
+
+                            if (start_column < my_column)
+                            {
+                                test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = true;
+                                    rand_choose_left = false;
+                                }
+
+                            }
+                            else if (start_column > my_column)
+                            {
+                                test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                if (test_to_column == true)
+                                {
+                                    rand_choose_right = false;
+                                    rand_choose_left = true;
+                                }
+
+                            }
+
+                            if (start_column != my_column)
+                            {
+                                if (test_to_column == false)
+                                {
+                                    test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                                }
+                                if (test_to_column == true)
+                                {
+                                    test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                }
+                            }
+                            else if (start_column == my_column)
+                            {
+                                test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                            }
+                            if (test_to_row == false)
+                            {
+
+                                while (test_to_row == false)
+                                {
+                                    if (rand_choose_left == true)
+                                    {
+                                        test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                                        if (test_to_column == false)
+                                        {
+                                            rand_choose_left = false;
+                                            rand_choose_right = true;
+                                        }
+                                    }
+                                    else if (rand_choose_right == true)
+                                    {
+                                        test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                                        if (test_to_column == false)
+                                        {
+                                            rand_choose_right = false;
+                                            rand_choose_left = true;
+                                        }
+                                    }
+                                    test_to_row = Try_to_move_down(ref start_row, ref start_column);
+                                }
+
+
+
+                            }
+
+
+
+
+
+                            //Допрацювати даний код
+                            //else if (test_to_row == false && test_to_column == false)
+                            //{
+                            //    while (test_to_column == false)
+                            //    {
+                            //        test_to_row = Try_to_move_top(ref start_row, ref start_column);
+                            //        if (start_column < my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_right(ref start_row, ref start_column);
+
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = true;
+                            //                rand_choose_left = false;
+                            //            }
+                            //        }
+                            //        else if (start_column > my_column && test_to_row == true)
+                            //        {
+                            //            test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //            if (test_to_column == true)
+                            //            {
+                            //                rand_choose_right = false;
+                            //                rand_choose_left = true;
+                            //            }
+                            //        }
+                            //        if (test_to_row == false)
+                            //        {
+                            //            while (test_to_row = Try_to_move_down(ref start_row, ref start_column) == true || test_to_column == true)
+                            //            {
+                            //                if (start_column < my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_left(ref start_row, ref start_column);
+                            //                }
+                            //                else if (start_column > my_column)
+                            //                {
+                            //                    test_to_column = Try_to_move_right(ref start_row, ref start_column);
+                            //                }
+                            //            }
+                            //        }
+
+                            //    }
+                            //}
+                        }
+
+                    }
+                    all_ways_to_my_tank_by_center_point.Add(temp_list_to_all_list);
+
+                }
+
+            }
+
+            the_best_way = Choose_the_best_way(all_ways_to_my_tank_by_center_point);
+
+
+            
             //IF MOVE UP == 1;
             //IF MOVE DOWN == 2;
             //IF MOVE RIGHT == 3;
             //IF MOVE LEFT == 4;
             double Center_X = Center_of_bot.X;
             double Center_Y = Center_of_bot.Y;
-            for(int i = 0; i < all_ways_to_my_tank_by_center_point[0].Count; i++)
+            for(int i = 0; i < the_best_way.Count; i++)
             {
                 bool test_to_position_X = false;
                 bool test_to_position_Y = false;
-                Point point_from_grid = all_ways_to_my_tank_by_center_point[0][i];
+                Point point_from_grid = the_best_way[i];
                 while(test_to_position_X  == false || test_to_position_Y == false)
                 {
                     if(test_to_position_X == false)
@@ -320,7 +951,7 @@ namespace WpfLibrary
                         while (Center_Y > point_from_grid.Y && test_to_mass == true)
                         {
                             mass_of_move.Add(1);
-                            Center_Y -= 3;
+                            Center_Y -= 3;  
                             if(Center_Y <= point_from_grid.Y)
                             {
                                 test_to_mass = false;
@@ -330,11 +961,23 @@ namespace WpfLibrary
                     }
                 }
             }
-            
+            //if(first_iteration == false)
+            //{
+            //    if(mass_of_move.Count > previous_mass_of_move_count.Count)
+            //    {
+            //        mass_of_move = previous_mass_of_move_count;
+            //    }
+            //}
+            //previous_mass_of_move_count = mass_of_move;
+            first_iteration = false;
+            allow_move = true;
+            allow_to_refresh = true;
+            test_to_allow_changing_EmptyCell = true;
+
         }
         public bool Try_to_move_down(ref int start_row,ref int start_column)
         {
-            List<Point> temp_list = new List<Point>();
+            Point temp_list = new Point();
             bool test_to_row = false;
      
             start_row++;
@@ -342,67 +985,99 @@ namespace WpfLibrary
             {
                 if (start_row == EmptyRow[i] && start_column == EmptyColumn[i])
                 {
-                    temp_list.Add(Get_Center_Point_From_Grid_Cell(start_row, start_column));
+                    temp_list = Get_Center_Point_From_Grid_Cell(start_row, start_column);
                     test_to_row = true;
                     break;
                 }
-
             }
+            
             if (!test_to_row)
             {
                 start_row--;
             }
-
-            temp_list_to_all_list.AddRange(temp_list);
+            if (temp_list.X != 0 && temp_list.Y != 0)
+            {
+                temp_list_to_all_list.Add(temp_list);
+            }
             return test_to_row;
         }
-        public bool Try_to_move_left(ref int start_row,ref int start_column)
+        public bool Try_to_move_left(ref int start_row, ref int start_column)
         {
-            List<Point> temp_list = new List<Point>();
+            Point temp_list = new Point();
             bool test_to_column = false;
             start_column--;
 
             for (int i = 0; i < EmptyColumn.Count; i++)
             {
-
                 if (start_row == EmptyRow[i] && start_column == EmptyColumn[i])
                 {
-                    temp_list.Add(Get_Center_Point_From_Grid_Cell(start_row, start_column));
+                    temp_list = Get_Center_Point_From_Grid_Cell(start_row, start_column);
                     test_to_column = true;
+                    break;
                 }
-
             }
+            
             if (!test_to_column)
             {
                 start_column++;
             }
-
-            temp_list_to_all_list.AddRange(temp_list);
+            if (temp_list.X != 0 && temp_list.Y != 0)
+            {
+                temp_list_to_all_list.Add(temp_list);
+            }
             return test_to_column;
         }
         public bool Try_to_move_right(ref int start_row,ref int start_column)
         {
-            List<Point> temp_list = new List<Point>();
+            Point temp_list = new Point();
             bool test_to_column = false;
             start_column++;
 
             for (int i = 0; i < EmptyColumn.Count; i++)
             {
-
                 if (start_row == EmptyRow[i] && start_column == EmptyColumn[i])
                 {
-                    temp_list.Add(Get_Center_Point_From_Grid_Cell(start_row, start_column));
+                    temp_list = Get_Center_Point_From_Grid_Cell(start_row, start_column);
                     test_to_column = true;
+                    break;
                 }
-
             }
+            
             if (!test_to_column)
             {
                 start_column--;
             }
-
-            temp_list_to_all_list.AddRange(temp_list);
+            if (temp_list.X != 0 && temp_list.Y != 0)
+            {
+                temp_list_to_all_list.Add(temp_list);
+            }
             return test_to_column;
+        }
+        public bool Try_to_move_top(ref int start_row,ref int start_column)
+        {
+            Point temp_list = new Point();
+            bool test_to_row = false;
+
+            start_row--;
+            for (int i = 0; i < EmptyRow.Count; i++)
+            {
+                if (start_row == EmptyRow[i] && start_column == EmptyColumn[i])
+                {
+                    temp_list = Get_Center_Point_From_Grid_Cell(start_row, start_column);
+                    test_to_row = true;
+                    break;
+                }
+            }
+            
+            if (!test_to_row)
+            {
+                start_row++;
+            }
+            if (temp_list.X != 0 && temp_list.Y != 0)
+            {
+                temp_list_to_all_list.Add(temp_list);
+            }
+            return test_to_row;
         }
         public Point Get_Center_Point_From_Grid_Cell(int row,int column)
         {
@@ -432,6 +1107,7 @@ namespace WpfLibrary
                     if (temp_list[l].Y <= cumulativeHeight)
                     {
                         list_of_cell.Add(i);
+                        break;
                     }
                 }
                 //Знайти стовпчик;
@@ -439,9 +1115,10 @@ namespace WpfLibrary
                 for (int i = 0; i < grid_field.ColumnDefinitions.Count; i++)
                 {
                     cumulativeWidth += grid_field.ColumnDefinitions[i].ActualWidth;
-                    if (temp_list[l].X < cumulativeWidth)
+                    if (temp_list[l].X <= cumulativeWidth)
                     {
                         list_of_cell.Add(i);
+                        break;
                     }
                 }
 
@@ -449,10 +1126,36 @@ namespace WpfLibrary
             return list_of_cell;
         }
 
+        public List<Point> Choose_the_best_way(List<List<Point>> all_finded_ways)
+        {
+            List<Point> best_way = new List<Point>();
+            int the_best_index = 0;
+            int max_count = int.MinValue;
+            int min_count = int.MaxValue;
+
+            for (int i = 0; i < all_finded_ways.Count; i++)
+            {
+                if (all_finded_ways[i].Count >= max_count)
+                {
+                    max_count = all_finded_ways[i].Count;
+
+                }
+                else if (all_finded_ways[i].Count <= min_count)
+                {
+                    min_count = all_finded_ways[i].Count;
+                    the_best_index = i;
+                }
+            }
+
+            best_way = all_finded_ways[the_best_index];
+            return best_way;
+        }
         public void Test_to_Fire()
         {
+            
             shouldContinue_rotate = false;
-            test_to_visible_my_tank = true;
+            test_to_visible_my_tank = false;
+            bool temp_test = true;
             List<Point> line_to_mytank = GetLinePoint(Center_of_bot,Center_of_my_tank);
             for(int i = 0; i < line_to_mytank.Count; i++)
             {
@@ -460,9 +1163,15 @@ namespace WpfLibrary
                 {
                     if (line_to_mytank[i] == Texture_point[j])
                     {
+                        temp_test = false;
                         test_to_visible_my_tank = false;
                         break;
                     }
+                    
+                }
+                if(temp_test == true)
+                {
+                    test_to_visible_my_tank = true;
                 }
                 if(test_to_visible_my_tank == false)
                 {
@@ -471,9 +1180,11 @@ namespace WpfLibrary
             }
             if(test_to_visible_my_tank == true)
             {
+                
                 Application.Current.Dispatcher.InvokeAsync( async() =>
                 {
-                    
+                    PlayShotOponents();
+                    allow_move = false;
                     battle.Rotate_muzzle(Center_of_my_tank, oponents[0], canvas, side_of_move);
                     
 
@@ -492,7 +1203,9 @@ namespace WpfLibrary
                         rotate_muzzle_timer.Dispose();
                         test_to_finish_game = true;
                     }
+                    allow_move = true;
                 }); 
+                
             }
             shouldContinue_rotate = true;
         }
@@ -535,14 +1248,13 @@ namespace WpfLibrary
         {
             double cellWidth = grid_field.ActualWidth / grid_field.ColumnDefinitions.Count;
             double cellHeight = grid_field.ActualHeight / grid_field.RowDefinitions.Count;
-            for (int i = 0; i < EmptyRow.Count - 1; i++)
+            for (int i = 0; i < EmptyRow.Count; i++)
             {
-                for (int j = 0; j < EmptyColumn.Count - 1; j++)
-                {
-                    double CenterX = (EmptyColumn[j] * cellWidth) + (cellWidth / 2);
-                    double CenterY = (EmptyRow[i] * cellHeight) + (cellHeight / 2);
-                    Center_of_cell_field.Add(new Point(CenterX, CenterY));
-                }
+
+                double CenterX = (EmptyColumn[i] * cellWidth) + (cellWidth / 2);
+                double CenterY = (EmptyRow[i] * cellHeight) + (cellHeight / 2);
+                Center_of_cell_field.Add(new Point(CenterX, CenterY));
+
             }
         }   
     }

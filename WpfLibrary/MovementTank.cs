@@ -297,7 +297,7 @@ namespace WpfLibrary
                         speed_of_tank = speed_of_tank * 2;
                         timer.Start();
                     }
-                    else if (timer.IsEnabled == true && speed_of_tank <= 3)
+                    else if (timer.IsEnabled == true && speed_of_tank < 3)
                     {
                         speed_of_tank = speed_of_tank * 2;
 

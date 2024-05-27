@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfAnimatedGif;
 using System.Windows.Media.Animation;
+using NAudio.Wave;
+using NAudio.Vorbis;
 
 
 namespace Wpf_Cursova
@@ -22,9 +24,16 @@ namespace Wpf_Cursova
     /// </summary>
     public partial class StartMenu : Window
     {
+        private bool test_to_enable_sound_main_menu = true;
+        public IWavePlayer waveOutDevice;
+        public WaveStream mainOutputStream;
+        public WaveChannel32 volumeStream;
+        public float initialVolume = 1.0f;
+        private string filePath;
         public StartMenu()
         {
             InitializeComponent();
+            filePath = @"D:\My Homework\Cursova\Texture_image\main_menu_sound.ogg";
             hide_window.MouseLeftButtonDown += Hide_window_Click;
             this.Activated += StartMenu_Activated;
             Fill_Windows();
@@ -33,6 +42,65 @@ namespace Wpf_Cursova
             start_game_one_player.MouseLeftButtonDown += Start_game_one_player_MouseLeftButtonDown;
             start_multiplayer.MouseLeftButtonDown += Start_multiplayer_MouseLeftButtonDown;
             grid_of_window.MouseLeftButtonDown += Grid_of_window_MouseLeftButtonDown;
+            sound_icon.MouseLeftButtonDown += Sound_icon_MouseLeftButtonDown;
+            PlayBackgroundMusic(filePath);
+            this.Closed += StartMenu_Closed;
+        }
+
+        protected void StartMenu_Closed(object sender, EventArgs e)
+        {
+            waveOutDevice.Stop();
+            mainOutputStream.Dispose();
+            waveOutDevice.Dispose();
+        }
+
+        private void PlayBackgroundMusic(string filename)
+        {
+            waveOutDevice = new WaveOut();
+            mainOutputStream = CreateInputStream(filename);
+            waveOutDevice.Init(mainOutputStream);
+            waveOutDevice.Play();
+        }
+        private WaveStream CreateInputStream(string filename)
+        {
+            if (filename.EndsWith(".ogg"))
+            {
+                var vorbisReader = new VorbisWaveReader(filename);
+                volumeStream = new WaveChannel32(vorbisReader);
+                volumeStream.Volume = initialVolume;
+            }
+            else
+            {
+                throw new InvalidOperationException("Unsupported extension");
+            }
+            return volumeStream;
+        }
+        
+        private void Sound_icon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if(test_to_enable_sound_main_menu == true)
+            {
+                BitmapImage bitmap = new BitmapImage(new Uri("D:\\My Homework\\Cursova\\Texture_image\\silence_icon.png", UriKind.RelativeOrAbsolute));
+                sound_icon.Stretch = Stretch.Fill;
+                sound_icon.Source = bitmap;
+                if(volumeStream != null)
+                {
+                    volumeStream.Volume = 0.0f;
+                }
+                test_to_enable_sound_main_menu = false;
+            }
+            else
+            {
+                
+                BitmapImage bitmap = new BitmapImage(new Uri("D:\\My Homework\\Cursova\\Texture_image\\sound_icon.png", UriKind.RelativeOrAbsolute));
+                sound_icon.Stretch = Stretch.Fill;
+                sound_icon.Source = bitmap;
+                if(volumeStream != null)
+                {
+                    volumeStream.Volume = initialVolume;
+                }
+                test_to_enable_sound_main_menu = true;
+            }
         }
 
         private void Grid_of_window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

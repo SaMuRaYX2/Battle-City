@@ -42,7 +42,7 @@ namespace WpfLibrary
                 oponent.Tank_grid.RenderTransformOrigin = new Point(0.5, 0.5);
                 return test_to_oponent;
             }
-            else if (list_oponents.Count < 4)
+            else if (list_oponents.Count < 4 )
             {
                 Oponent oponent = new Oponent(); 
                 oponent.canvas = canvas;
@@ -60,10 +60,10 @@ namespace WpfLibrary
                 return test_to_oponent = false;
             }
         }
-        public async void BackGroundCreatingBots()
+        public async Task BackGroundCreatingBots()
         {
             bool test_creating_bot = true;
-            while (test_creating_bot && number_of_oponents_now <= max_number_of_oponents)
+            while (test_creating_bot && number_of_oponents_now < max_number_of_oponents)
             {
                 test_creating_bot = MyAsyncIteration(oponents_tank, Points, play_zone);
                 if (test_creating_bot == true)

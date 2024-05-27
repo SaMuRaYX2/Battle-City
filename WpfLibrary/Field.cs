@@ -36,6 +36,7 @@ namespace WpfLibrary
         public List<int> FillColumn { get; private set; }
         public List<int> EmptyRow { get; set; }
         public List<int> EmptyColumn { get; set; }
+        public bool first_iteration_to_find_empty_cell = false;
 
         public Bonus bonus { get; set; }
         public Field()
@@ -286,7 +287,20 @@ namespace WpfLibrary
         }
         public void Find_Empty_Field()
         {
+            EmptyRow.Clear();
+            EmptyColumn.Clear();
+            
             bool test_to_empty_grid = true;
+            
+            if (first_iteration_to_find_empty_cell == true)
+            {
+                
+                int number_of_oponent = oponents.Count - 1;
+                FillRow.RemoveRange(FillRow.Count - number_of_oponent, number_of_oponent);
+                FillColumn.RemoveRange(FillColumn.Count - number_of_oponent, number_of_oponent);
+            }
+            Find_Fill_Row_and_Column();
+            first_iteration_to_find_empty_cell = true;
             for (int i = 1; i < Grid_field.RowDefinitions.Count - 1; i++)
             {
                 
@@ -307,6 +321,42 @@ namespace WpfLibrary
                     }
                 }
                 
+
+            }
+        }
+        public void Find_Fill_Row_and_Column()
+        {
+            
+            for (int j = 1; j < oponents.Count; j++)
+            {
+                Point Center_of_oponent = new Point(oponents[j].PositionX + oponents[j].Width / 2, oponents[j].PositionY + oponents[j].Height);
+
+
+
+                //Знайти рядок;
+                double cumulativeHeight = 0;
+                for (int i = 0; i < Grid_field.RowDefinitions.Count; i++)
+                {
+                    cumulativeHeight += Grid_field.RowDefinitions[i].ActualHeight;
+                    if (Center_of_oponent.Y <= cumulativeHeight)
+                    {
+                        FillRow.Add(i);
+                        break;
+                    }
+                }
+                //Знайти стовпчик;
+                double cumulativeWidth = 0;
+                for (int i = 0; i < Grid_field.ColumnDefinitions.Count; i++)
+                {
+                    cumulativeWidth += Grid_field.ColumnDefinitions[i].ActualWidth;
+                    if (Center_of_oponent.X <= cumulativeWidth)
+                    {
+                        FillColumn.Add(i);
+                        break;
+                    }
+                }
+
+
 
             }
         }
@@ -415,7 +465,7 @@ namespace WpfLibrary
         {
 
             List<Point> temp_point = new List<Point>();
-            int pad = 5;
+            int pad = 6;
             Rect cellRectHorizontal = new Rect(0, 0, oponents.Width, pad);
             Rect cellRectVertical = new Rect(0, pad, pad, oponents.Height - pad * 2);
             Rect cellRectRightTopHorizontal = new Rect(oponents.Width, 0, oponents.Width, pad);
@@ -488,7 +538,7 @@ namespace WpfLibrary
         {
 
             List<Point> temp_point = new List<Point>();
-            int pad = 5;
+            int pad = 6;
 
             Rect cellRectHorizontal = new Rect();
             Application.Current.Dispatcher.Invoke(() =>

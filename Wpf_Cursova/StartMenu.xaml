@@ -65,6 +65,8 @@
         <TextBlock x:Name="start_multiplayer" Grid.Row="8" Grid.ColumnSpan="6" Grid.Column="6" Grid.RowSpan="2" Text="Multiplayer" TextAlignment="Center" VerticalAlignment="Center" FontSize="25" FontStyle="Italic" FontWeight="Bold" Foreground="#e65c00" Opacity="1" Margin="20,0,20,0"></TextBlock>
         
         <Image x:Name="background_gif" Stretch="UniformToFill" Grid.ColumnSpan="18" Grid.RowSpan="15" Panel.ZIndex="-2"></Image>
+        <Image x:Name="sound_icon" Grid.ColumnSpan="2" Grid.RowSpan="2" Stretch="Fill" Source="D:\My Homework\Cursova\Texture_image\sound_icon.png"></Image>
+        
     </Grid>
     
 </Window>

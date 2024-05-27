@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using WpfLibrary;
+using NAudio.Wave;
 
 namespace Wpf_Cursova
 {
@@ -71,7 +72,7 @@ namespace Wpf_Cursova
         private DispatcherTimer tank2Timer;
         private DispatcherTimer fireTimer;
         protected DispatcherTimer Clear_Killed_Tank;
-        public Timer refresh_bot_timer;
+        public Timer timer_check_finish_game;
 
         private bool canShoot = true;
         private bool canShootMouse = true;
@@ -82,18 +83,73 @@ namespace Wpf_Cursova
         public int number_of_oponents_now { get; set; }
         public int damage_of_my_tank { get; set; }
         public int damage_of_oponent { get; set; }
+        public bool exit_from_pause_menu { get; set; }
+        private bool sound_oponent_finish = true;
+        private bool sound_tank_finish = true;
+        
+        WaveOutEvent waveOut_tank;
+        WaveOutEvent waveOut_oponent;
+        AudioFileReader audioFileReader_tank;
+        AudioFileReader audioFileReader_oponent;
+
 
         public MainWindow()
         {
             InitializeComponent();
             pause_game.MouseLeftButtonDown += Pause_game_MouseLeftButtonDown;
+            exit_from_pause_menu = false;
+            
+        }
 
+        
+        public void PlayShotTank()
+        {
+            if (sound_tank_finish == true)
+            {
+                sound_tank_finish = false;
+                audioFileReader_tank = new AudioFileReader("D:\\My Homework\\Cursova\\Texture_image\\boom9.wav");
+                waveOut_tank = new WaveOutEvent();
+                waveOut_tank.PlaybackStopped += WaveOut_tank_PlaybackStopped;
+                waveOut_tank.Init(audioFileReader_tank);
+                waveOut_tank.Play();
+            }
+        }
+
+        private void WaveOut_tank_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            audioFileReader_tank.Dispose();
+            waveOut_tank.Dispose();
+            sound_tank_finish = true;
+        }
+
+        public void PlayShotOponents()
+        {
+            if (sound_oponent_finish == true)
+            {
+                sound_oponent_finish = false;
+                audioFileReader_oponent = new AudioFileReader("D:\\My Homework\\Cursova\\Texture_image\\boom8.wav");
+                waveOut_oponent = new WaveOutEvent();
+                waveOut_oponent.PlaybackStopped += WaveOut_oponent_PlaybackStopped;
+                waveOut_oponent.Init(audioFileReader_oponent);
+                waveOut_oponent.Play();
+            }
+            
+        }
+
+        private void WaveOut_oponent_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            audioFileReader_oponent.Dispose();
+            waveOut_oponent.Dispose();
+            sound_oponent_finish = true;
         }
 
         private void Pause_game_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             PauseGame pauseGame = new PauseGame();
+            pauseGame.my_bot = bot;
             pauseGame.ShowDialog();
+            
+            
         }
 
         private void WindowKeyDown(object sender, KeyEventArgs e)
@@ -342,6 +398,7 @@ namespace Wpf_Cursova
                 Bullet_Oponent bullet_oponent = new Bullet_Oponent(play_zone, oponents_tank[0], oponents_tank[0].Under_Muzzle_tank, point_bullet_to_oponent, side_rotate_oponent, 0, Points, damage_of_oponent);
                 bullet_oponent.GetOponents(oponents_tank);
                 bullet_oponent.GetMainTank(my_tank);
+                PlayShotOponents();
                 await Task.WhenAll(bullet_oponent.Make_a_shot());
 
 
@@ -388,6 +445,7 @@ namespace Wpf_Cursova
                 bullet.GetMainTank(my_tank);
                 bullet.timer = Clear_Killed_Tank;
                 bullet.creating_oponent = creating;
+                PlayShotTank();
                 await Task.WhenAll(bullet.Make_a_shot());
                 if(oponents_tank.Count == 0)
                 {
@@ -466,7 +524,7 @@ namespace Wpf_Cursova
             damage_of_my_tank = move.damage_of_my_tank;
             damage_of_oponent = move_oponent.damage_of_oponent;
             //Для 2-ох іграків;
-            max_number_of_oponents = 5;
+            max_number_of_oponents = 2;
             number_of_oponents_now = 0;
             //Для 2-ох іграків;
             
@@ -508,7 +566,7 @@ namespace Wpf_Cursova
             creating.number_of_oponents_now = this.number_of_oponents_now;
             creating.BackGroundCreatingBots();
         }
-        internal void Start_game_for_one_player()
+        internal async void Start_game_for_one_player()
         {
             //MessageBoxResult result = MessageBox.Show("Покищо розробка режиму гри на одного гравця відбувається в планах!!!", "Зачекайте зовсім скоро(OK - вийти в Menu,Cancel - вийти з гри)", MessageBoxButton.OKCancel, MessageBoxImage.Information);
             //if (result == MessageBoxResult.OK)
@@ -551,7 +609,7 @@ namespace Wpf_Cursova
             damage_of_my_tank = move.damage_of_my_tank;
             damage_of_oponent = move_oponent.damage_of_oponent;
             //Для 1-го іграка;
-            max_number_of_oponents = 5;
+            max_number_of_oponents = 2;
             number_of_oponents_now = 0;
             //Для 1-го іграка;
             if (my_tank == null)
@@ -589,35 +647,37 @@ namespace Wpf_Cursova
             creating.play_zone = this.play_zone;
             creating.max_number_of_oponents = this.max_number_of_oponents;
             creating.number_of_oponents_now = this.number_of_oponents_now;
-            creating.BackGroundCreatingBots();
+            await creating.BackGroundCreatingBots();
             //Initialization bot
             Initial_Bot();
         }
         public void Initial_Bot()
         {
+            bot = new Bot(my_field, oponents_tank, my_tank, move_oponent, Points, play_zone, damage_of_oponent);
             
-            bot = new Bot(my_field,oponents_tank,my_tank,move_oponent,Points,play_zone,damage_of_oponent);
-
             TimerCallback timerCallBack = new TimerCallback(OnTimerEvent);
-            refresh_bot_timer = new Timer(timerCallBack,null,0,16);
+            timer_check_finish_game = new Timer(timerCallBack,null,1000,1000);
+            
         }
         public void OnTimerEvent(object state)
         {
-            Application.Current.Dispatcher.InvokeAsync(() =>
+            if (bot.test_to_finish_game == true)
             {
-                if (bot.test_to_finish_game == true)
+                Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    refresh_bot_timer.Dispose();
+
+                    timer_check_finish_game.Dispose();
                     Result_of_Game result_Of_Game = new Result_of_Game();
                     result_Of_Game.Name_of_winner = Name_of_player_2;
                     result_Of_Game.Enter_Winner_Name();
                     result_Of_Game.ShowDialog();
                     DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
                     result_Of_Game.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
-                }
-                bot.Refresh_information_to_bot();
-                
-            });
+
+                    //bot.Refresh_information_to_bot();
+
+                });
+            }
             
         }
         internal void Start_game_for_multiplayer()

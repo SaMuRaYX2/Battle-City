@@ -60,6 +60,7 @@ namespace WpfLibrary
             Canvas.SetLeft(grid_bullet, point_to_ballet.X - grid_bullet.Width / 2);
             Canvas.SetTop(grid_bullet, point_to_ballet.Y);
             Play_zone.Children.Add(grid_bullet);
+            
             Make_BOOM_From_Muzzle();
             Play_zone.UpdateLayout();
             bool bullet_test = true;

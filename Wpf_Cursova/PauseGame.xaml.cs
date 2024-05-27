@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfAnimatedGif;
+using WpfLibrary;
 
 namespace Wpf_Cursova
 {
@@ -20,16 +21,25 @@ namespace Wpf_Cursova
     /// </summary>
     public partial class PauseGame : Window
     {
+        public bool exit_from_game { get; set; }
+        public Bot my_bot { get; set; }
         public PauseGame()
         {
             InitializeComponent();
             Do_Some_Decoration();
             continue_game.MouseLeftButtonDown += Continue_game_MouseLeftButtonDown;
             exit_menu.MouseLeftButtonDown += Exit_menu_MouseLeftButtonDown;
+            exit_from_game = false;
+            
         }
 
         private void Exit_menu_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            exit_from_game = true;
+            if(my_bot != null)
+            {
+                my_bot.test_to_exit_pauseGame = exit_from_game;
+            }
             StartMenu startMenu = new StartMenu();
             startMenu.Show();
             this.Close();

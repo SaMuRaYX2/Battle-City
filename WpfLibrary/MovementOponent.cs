@@ -15,7 +15,7 @@ namespace WpfLibrary
         //{
 
         //}
-        
+        public bool IsOponentBot = false;
         public double speed_of_tank = 3;
         bool initialization_of_timer = false;
         public int damage_of_oponent = 25;
@@ -263,30 +263,43 @@ namespace WpfLibrary
                 if (source != null && source.ToString() == "file:///D:/My Homework/Cursova/Texture_image/speed_bonus.png")
                 {
                     test_to_bonus = true;
-                    if (timer.IsEnabled != true)
+                    if (!IsOponentBot)
                     {
-                        speed_of_tank = speed_of_tank * 2;
+                        if (timer.IsEnabled != true)
+                        {
+                            speed_of_tank = speed_of_tank * 2;
+                            timer.Start();
+                        }
+                        else if (timer.IsEnabled == true && speed_of_tank <= 3)
+                        {
+                            speed_of_tank = speed_of_tank * 2;
+
+                        }
+                    }
+                    else
+                    {
                         timer.Start();
                     }
-                    else if(timer.IsEnabled == true && speed_of_tank <= 3)
-                    {
-                        speed_of_tank = speed_of_tank * 2;
-                        
-                    }
-                    
                 }
                 else if (source != null && source.ToString() == "file:///D:/My Homework/Cursova/Texture_image/slow_bonus.png")
                 {
                     test_to_bonus = true;
-                    if (timer.IsEnabled != true)
-                    {  
-                        speed_of_tank = speed_of_tank / 3;
-                        timer.Start();
-                    }
-                    else if(timer.IsEnabled == true && speed_of_tank >= 3)
+                    if (!IsOponentBot)
                     {
-                        speed_of_tank = speed_of_tank / 3;
-                        
+                        if (timer.IsEnabled != true)
+                        {
+                            speed_of_tank = speed_of_tank / 3;
+                            timer.Start();
+                        }
+                        else if (timer.IsEnabled == true && speed_of_tank >= 3)
+                        {
+                            speed_of_tank = Math.Round(speed_of_tank / 3);
+
+                        }
+                    }
+                    else
+                    {
+                        timer.Start();
                     }
                 }
                 else if (source != null && source.ToString() == "file:///D:/My Homework/Cursova/Texture_image/buff_muzzle.png")
