@@ -11,7 +11,8 @@
         MinHeight="600"
         MaxWidth="800"
         MinWidth="800"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Icon="D:\My Homework\Cursova\Texture_image\Icon_Battle_City.png">
     
     <Grid>
         <Grid.RowDefinitions>

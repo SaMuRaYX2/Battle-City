@@ -98,7 +98,10 @@ namespace Wpf_Cursova
             InitializeComponent();
             pause_game.MouseLeftButtonDown += Pause_game_MouseLeftButtonDown;
             exit_from_pause_menu = false;
-            
+            this.WindowStyle = WindowStyle.None;
+            this.WindowState = WindowState.Maximized;
+            this.ResizeMode = ResizeMode.NoResize;
+
         }
 
         
@@ -524,7 +527,7 @@ namespace Wpf_Cursova
             damage_of_my_tank = move.damage_of_my_tank;
             damage_of_oponent = move_oponent.damage_of_oponent;
             //Для 2-ох іграків;
-            max_number_of_oponents = 2;
+            max_number_of_oponents = 8;
             number_of_oponents_now = 0;
             //Для 2-ох іграків;
             
@@ -609,7 +612,7 @@ namespace Wpf_Cursova
             damage_of_my_tank = move.damage_of_my_tank;
             damage_of_oponent = move_oponent.damage_of_oponent;
             //Для 1-го іграка;
-            max_number_of_oponents = 2;
+            max_number_of_oponents = 6;
             number_of_oponents_now = 0;
             //Для 1-го іграка;
             if (my_tank == null)

@@ -88,14 +88,12 @@
     <Compile Include="Bullet_Oponent.cs" />
     <Compile Include="Bot.cs" />
     <Compile Include="Creating_oponent.cs" />
+    <Compile Include="CustomControl1.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="MovementOponent.cs" />
     <Compile Include="MovementTank.cs" />
     <Compile Include="Oponent.cs" />
     <Compile Include="Tank.cs" />
-    <Compile Include="CustomControl1.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

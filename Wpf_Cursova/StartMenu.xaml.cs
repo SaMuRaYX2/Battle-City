@@ -134,6 +134,7 @@ namespace Wpf_Cursova
             {
                 enterInformationGamer.Show();
                 enterInformationGamer.player_2.Text = "You choose game for one";
+                enterInformationGamer.player_2.FontSize = 18;
                 enterInformationGamer.player_2.IsReadOnly = true;
                 enterInformationGamer.Type_of_game = "Гра з ботом";
                 this.Close();

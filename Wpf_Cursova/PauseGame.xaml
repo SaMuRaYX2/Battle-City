@@ -10,7 +10,8 @@
         MaxWidth="600" MinWidth="600"
         WindowStyle="None"
         ShowInTaskbar="True"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Icon="D:\My Homework\Cursova\Texture_image\Icon_Battle_City.png">
     <Grid x:Name="grid_background">
         
         <Grid.RowDefinitions>
