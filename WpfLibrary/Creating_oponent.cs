@@ -25,8 +25,8 @@ namespace WpfLibrary
                 Oponent oponent = new Oponent();
                 oponent.canvas = canvas;
                 //Для гри на двох;
-                oponent.PositionX = 150;
-                oponent.PositionY = 100;
+                oponent.PositionX = 160;
+                oponent.PositionY = 80;
                 //Для гри з ботами;
                 //oponent.PositionX = 100;
                 //oponent.PositionY = 100;

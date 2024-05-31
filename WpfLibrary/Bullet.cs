@@ -271,7 +271,6 @@ namespace WpfLibrary
                     {
                         Destroy_tank(oponents[i]);
                         Make_Boom_tank(position_of_bullet);
-                        Tank.Killed_Oponents.Add(oponents[i].Tank_grid);
                         oponents.RemoveAt(i);
                         Play_zone.UpdateLayout();
                         creating_oponent.BackGroundCreatingBots();

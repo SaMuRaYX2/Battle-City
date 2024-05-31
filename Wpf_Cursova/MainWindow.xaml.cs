@@ -676,7 +676,7 @@ namespace Wpf_Cursova
                     result_Of_Game.ShowDialog();
                     DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
                     result_Of_Game.BeginAnimation(Window.OpacityProperty, fadeInAnimation);
-
+                    bot = null;
                     //bot.Refresh_information_to_bot();
 
                 });
